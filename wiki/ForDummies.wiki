@@ -1,4 +1,5 @@
 #summary Google Mock for Dummies.
+#labels Featured
 
 = Google C++ Mocking Framework for Dummies =
 
