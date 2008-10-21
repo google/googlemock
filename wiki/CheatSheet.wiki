@@ -1,4 +1,5 @@
 #summary Google Mock Cheat Sheet.
+#labels Featured
 
 = Google Mock Cheat Sheet =
 
