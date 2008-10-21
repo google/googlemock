@@ -1,0 +1,377 @@
+#summary Google Mock Cheat Sheet.
+
+= Google Mock Cheat Sheet =
+
+== Defining a Mock Class ==
+
+=== Mocking a Normal Class ===
+
+Given
+{{{
+class Foo {
+  ...
+  virtual ~Foo();
+  virtual int GetSize() const = 0;
+  virtual string Describe(const char* name) = 0;
+  virtual string Describe(int type) = 0;
+  virtual bool Process(Bar elem, int count) = 0;
+};
+}}}
+(note that `~Foo()` *must* be virtual) we can define its mock as
+{{{
+#include <gmock/gmock.h>
+
+class MockFoo : public Foo {
+  MOCK_CONST_METHOD0(GetSize, int());
+  MOCK_METHOD1(Describe, string(const char* name));
+  MOCK_METHOD1(Describe, string(int type));
+  MOCK_METHOD2(Process, bool(Bar elem, int count));
+};
+}}}
+
+To create a "nice" mock object which ignores all uninteresting calls,
+or a "strict" mock object, which treats them as failures:
+{{{
+NiceMock<MockFoo> nice_foo;     // The type is a subclass of MockFoo.
+StrictMock<MockFoo> strict_foo; // The type is a subclass of MockFoo.
+}}}
+
+=== Mocking a Class Template ===
+
+To mock
+{{{
+template <typename Elem>
+class StackInterface {
+  ...
+  virtual ~StackInterface();
+  virtual int GetSize() const = 0;
+  virtual void Push(const Elem& x) = 0;
+};
+}}}
+(note that `~StackInterface()` *must* be virtual) just append `_T` to the `MOCK_*` macros:
+{{{
+template <typename Elem>
+class MockStack : public StackInterface<Elem> {
+  ...
+  MOCK_CONST_METHOD0_T(GetSize, int());
+  MOCK_METHOD1_T(Push, void(const Elem& x));
+};
+}}}
+
+=== Specifying Calling Conventions for Mock Functions ===
+
+If your mock function doesn't use the default calling convention, you
+can specify it by appending `_WITH_CALLTYPE` to any of the macros
+described in the previous two sections and supplying the calling
+convention as the first argument to the macro. For example,
+{{{
+  MOCK_METHOD_1_WITH_CALLTYPE(STDMETHODCALLTYPE, Foo, bool(int n));
+  MOCK_CONST_METHOD2_WITH_CALLTYPE(STDMETHODCALLTYPE, Bar, int(double x, double y));
+}}}
+where `STDMETHODCALLTYPE` is defined by `<objbase.h>` on Windows.
+
+== Using Mocks in Tests ==
+
+The typical flow is:
+  # Import the Google Mock names you need to use. All Google Mock names are in the `testing` namespace unless they are macros or otherwise noted.
+  # Create the mock objects.
+  # Optionally, set the default actions of the mock objects.
+  # Set your expectations on the mock objects (How will they be called? What wil they do?).
+  # Exercise code that uses the mock objects; if necessary, check the result using [http://code.google.com/p/googletest/ Google Test] assertions.
+  # When a mock objects is destructed, Google Mock automatically verifies that all expectations on it have been satisfied.
+
+Here is an example:
+{{{
+using testing::Return;                            // #1
+
+TEST(BarTest, DoesThis) {
+  MockFoo foo;                                    // #2
+
+  ON_CALL(foo, GetSize())                         // #3
+      .WillByDefault(Return(1));
+  // ... other default actions ...
+
+  EXPECT_CALL(foo, Describe(5))                   // #4
+      .Times(3)
+      .WillRepeatedly(Return("Category 5"));
+  // ... other expectations ...
+
+  EXPECT_EQ("good", MyProductionFunction(&foo));  // #5
+}                                                 // #6
+}}}
+
+== Setting Default Actions ==
+
+Google Mock has a *built-in default action* for any function that
+returns `void`, `bool`, a numeric value, or a pointer.
+
+To customize the default action for functions with return type `T` globally:
+{{{
+using testing::DefaultValue;
+
+DefaultValue<T>::Set(value);  // Sets the default value to be returned.
+// ... use the mocks ...
+DefaultValue<T>::Clear();     // Resets the default value.
+}}}
+
+To customize the default action for a particular method, use `ON_CALL()`:
+{{{
+ON_CALL(mock_object, method(matchers))
+    .WithArguments(multi_argument_matcher)  ?
+    .WillByDefault(action);
+}}}
+
+== Setting Expectations ==
+
+`EXPECT_CALL()` sets *expectations* on a mock method (How will it be
+called? What will it do?):
+{{{
+EXPECT_CALL(mock_object, method(matchers))
+    .WithArguments(multi_argument_matcher)  ?
+    .Times(cardinality)                     ?
+    .InSequence(sequences)                  *
+    .WillOnce(action)                       *
+    .WillRepeatedly(action)                 ?
+    .RetiresOnSaturation();                 ?
+}}}
+
+If `Times()` is omitted, the cardinality is assumed to be:
+
+  * `Times(1)` when there is neither `WillOnce()` nor `WillRepeatedly()`;
+  * `Times(n)` when there are `n WillOnce()`s but no `WillRepeatedly()`, where `n` >= 1; or
+  * `Times(AtLeast(n))` when there are `n WillOnce()`s and a `WillRepeatedly()`, where `n` >= 0.
+
+A method with no `EXPECT_CALL()` is free to be invoked _any number of times_, and the default action will be taken each time.
+
+== Matchers ==
+
+A *matcher* matches a _single_ argument. Built-in matchers (where
+`argument` is the function argument) are divided into several
+categories:
+
+=== Wildcard ===
+||`_`||`argument` can be any value of the correct type.||
+||`A<type>()` or `An<type>()`||`argument` can be any value of type `type`. ||
+
+=== Generic Comparison ===
+
+||`Eq(value)` or `value`||`argument == value`||
+||`Ge(value)`||`argument >= value`||
+||`Gt(value)`||`argument > value`||
+||`Le(value)`||`argument <= value`||
+||`Lt(value)`||`argument < value`||
+||`Ne(value)`||`argument != value`||
+||`NULL`||`argument` is `NULL`.||
+||`NotNull()`||`argument` is a non-null pointer.||
+||`Ref(variable)`||`argument` is a reference to `variable`.||
+||`TypedEq<type>(value)`||`argument` has type `type` and is equal to `value`. You may need to use this instead of `Eq(value)` when the mock function is overloaded.||
+
+Except `Ref()`, these matchers make a _copy_ of `value` in case it's
+modified or destructed later. If the compiler complains that `value`
+doesn't have a public copy constructor, try wrap it in `ByRef()`,
+e.g. `Eq(ByRef(non_copyable_value))`. If you do that, make sure
+`non_copyable_value` is not changed afterwards, or the meaning of your
+matcher will be changed.
+
+=== Floating-Point Matchers ===
+
+||`DoubleEq(a_double)`||`argument` is a `double` value approximately equal to `a_double`.||
+||`FloatEq(a_float)`||`argument` is a `float` value approximately equal to `a_float`.||
+
+`DoubleEq()` and `FloatEq()` use ULP-based comparison (the same as
+used in [http://code.google.com/p/googletest/ Google Test]). They
+automatically pick a reasonable error bound based on the absolute
+value of the expected value.
+
+=== String Matchers ===
+
+The `argument` can be either a C string or a C++ string object:
+
+||`ContainsRegex(string)`||`argument` matches the given regular expression.||
+||`EndsWith(suffix)`||`argument` ends with string `suffix`.||
+||`HasSubstr(string)`||`argument` contains `string` as a sub-string.||
+||`MatchesRegex(string)`||`argument` matches the given regular expression with the match starting at the first character and ending at the last character.||
+||`StartsWith(prefix)`||`argument` starts with string `prefix`.||
+||`StrCaseEq(string)`||`argument` is equal to `string`, ignoring case.||
+||`StrCaseNe(string)`||`argument` is not equal to `string`, ignoring case.||
+||`StrEq(string)`||`argument` is equal to `string`.||
+||`StrNe(string)`||`argument` is not equal to `string`.||
+
+`StrCaseEq()`, `StrCaseNe()`, `StrEq()`, and `StrNe()` work for wide
+strings as well.
+
+=== Container Matchers ===
+
+Most STL-style containers support `==`, so you can use
+`Eq(expected_container)` or simply `expected_container` to match a
+container exactly. If you want to write the elements in-line, or match
+them more flexibly, you can use:
+
+||`ElementsAre(e0, e1, ..., en)`||`argument` has `n + 1` elements, where the i-th element matches `ei`, which can be a value or a matcher. 0 to 10 arguments are allowed.||
+||`ElementsAreArray(array)` or `ElementsAreArray(array, count)`||The same as `ElementsAre()` except that the expected element values/matchers come from a C-style array.||
+
+=== Member Matchers ===
+
+||`Field(&class::field, m)`||`argument.field` (or `argument->field` when `argument` is a plain pointer) matches matcher `m`, where `argument` is an object of type _class_.||
+||`Property(&class::property, m)`||`argument.property()` (or `argument->property()` when `argument` is a plain pointer) matches matcher `m`, where `argument` is an object of type _class_.||
+
+=== Matching the Result of a Function or Functor ===
+
+||`ResultOf(f, m)`||`f(argument)` matches matcher `m`, where `f` is a function or functor.||
+
+=== Pointer Matchers ===
+
+||`Pointee(m)`||`argument` (either a smart pointer or a raw pointer) points to a value that matches matcher `m`.||
+
+=== Using a Function or Functor as a Matcher ===
+
+||`Truly(predicate)`||`predicate(argument)` returns something considered by C++ to be true, where `predicate` is a function or functor.||
+
+=== Multi-argument Matchers ===
+
+These are matchers on tuple types. They can be used in `.WithArguments()`. The following can be used on functions with _two arguments_:
+
+||`Eq()`||`arg1 == arg2`||
+||`Ge()`||`arg1 >= arg2`||
+||`Gt()`||`arg1 > arg2`||
+||`Le()`||`arg1 <= arg2`||
+||`Lt()`||`arg1 < arg2`||
+||`Ne()`||`arg1 != arg2`||
+
+=== Composite Matchers ===
+
+You can make a matcher from one or more other matchers:
+
+||`AllOf(m1, m2, ..., mn)`||`argument` matches all of the matchers `m1` to `mn`.||
+||`AnyOf(m1, m2, ..., mn)`||`argument` matches at least one of the matchers `m1` to `mn`.||
+||`Not(m)`||`argument` doesn't match matcher `m`.||
+
+=== Casting a Matcher ===
+
+||`MatcherCast<T>(m)`||casts matcher `m` to type `Matcher<T>`.||
+
+=== Matchers as Predicates ===
+
+As a nice gesture, Google Mock lets you turn a matcher `m` into a
+unary predicate (as used in various algorithms in STL) using
+`Matches(m)`.
+
+== Actions ==
+
+*Actions* specify what a mock function should do when invoked.
+
+=== Returning a Value ===
+
+||`Return()`||Return from a `void` mock function.||
+||`Return(value)`||Return `value`.||
+||`ReturnNull()`||Return a null pointer.||
+||`ReturnRef(variable)`||Return a reference to `variable`.||
+
+=== Side Effects ===
+
+||`Assign(&variable, value)`||Assign `value` to variable.||
+||`SetArgumentPointee<N>(value)`||Assign `value` to the variable pointed by the `N`-th (0-based) argument.||
+||`SetArrayArgument<N>(first, last)`||Copies the elements in source range [`first`, `last`) to the array pointed to by the `N`-th (0-based) argument, which can be either a pointer or an iterator. The action does not take ownership of the elements in the source range.||
+||`SetErrnoAndReturn(error, value)`||Set `errno` to `error` and return `value`.||
+
+=== Using a Function or a Functor as an Action ===
+
+||`Invoke(f)`||Invoke `f` with the arguments passed to the mock function, where `f` can be a global/static function or a functor.||
+||`Invoke(object_pointer, &class::method)`||Invoke the {method on the object with the arguments passed to the mock function.||
+||`InvokeWithoutArgs(f)`||Invoke `f`, which can be a global/static function or a functor. `f` must take no arguments.||
+||`InvokeWithoutArgs(object_pointer, &class::method)`||Invoke the method on the object, which takes no arguments.||
+||`InvokeArgument<N>(arg1, arg2, ..., argk)`||Invoke the mock function's `N`-th (0-based) argument, which must be a function or a functor, with the `k` arguments.||
+
+When defining a function or functor to be used with `Invoke*()`, you can declare any unused parameters as `Unused`:
+{{{
+  double Distance(Unused, double x, double y) { return sqrt(x*x + y*y); }
+  ...
+  EXPECT_CALL(mock, Foo("Hi", _, _)).WillOnce(Invoke(Distance));
+}}}
+
+In `InvokeArgument<N>(...)`, if an argument needs to be passed by reference, wrap it inside `ByRef()`. For example,
+{{{
+  InvokeArgument<2>(5, string("Hi"), ByRef(foo))
+}}}
+calls the mock function's #2 argument, passing to it `5` and `string("Hi")` by value, and `foo` by reference.
+
+=== Default Action ===
+
+||`DoDefault()`||Do the default action (specified by `ON_CALL()` or the built-in one).||
+
+*Note:* due to technical reasons, `DoDefault()` cannot be used inside  a composite action - trying to do so will result in a run-time error.
+
+=== Composite Actions ===
+
+||`DoAll(a1, a2, ..., an)`||Do all actions `a1` to `an` in each invocation.||
+||`IgnoreResult(a)`||Perform action `a` and ignore its result. `a` must not return void.||
+||`WithArg<N>(a)`||Pass the `N`-th (0-based) argument of the mock function to action `a` and perform it.||
+||`WithArgs<N1, N2, ..., Nk>(a)`||Pass the selected (0-based) arguments of the mock function to action `a` and perform it.||
+||`WithoutArgs(a)`||Perform action `a` without any arguments.||
+
+== Cardinalities ==
+
+These are used in `Times()` to specify how many times a mock function will be called:
+
+||`AnyNumber()`||The function can be called any number of times.||
+||`AtLeast(n)`||The call is expected at least `n` times.||
+||`AtMost(n)`||The call is expected at most `n` times.||
+||`Between(m, n)`||The call is expected between `m` and `n` (inclusive) times.||
+||`Exactly(n) or n`||The call is expected exactly `n` times. In particular, the call should never happen when `n` is 0.||
+
+== Sequences ==
+
+*Sequences* specify the order of expectations. _All expected calls_ in
+the same sequence must occur in the order they are specified;
+otherwise the calls can occur in any order.
+
+To create sequences:
+{{{
+Sequence s1, s2;
+}}}
+
+To use sequences:
+{{{
+EXPECT_CALL(foo, Reset())
+    .InSequence(s1, s2)
+    .WillOnce(Return(true));
+EXPECT_CALL(foo, GetSize())
+    .InSequence(s1)
+    .WillOnce(Return(1));
+EXPECT_CALL(foo, Describe(A<const char*>()))
+    .InSequence(s2)
+    .WillOnce(Return("dummy"));
+}}}
+
+(`Reset()` must be called before _both_ `GetSize()` _and_ `Describe()`; the latter two can occur in any order.)
+
+To put many expectations in a sequence conveniently:
+{{{
+{
+  InSequence dummy;
+
+  EXPECT_CALL(...)...;
+  EXPECT_CALL(...)...;
+  ...
+  EXPECT_CALL(...)...;
+}
+}}}
+
+(All expected calls in the scope of `dummy` must occur in strict
+order. The name `dummy` is irrelevant.)
+
+== Verifying and Resetting a Mock ==
+
+Google Mock will verify the expectations on a mock object when it is destructed, or you can do it earlier:
+{{{
+using testing::Mock;
+...
+// Verifies and removes the expectations on mock_obj;
+// returns true iff successful.
+Mock::VerifyAndClearExpectations(&mock_obj);
+...
+// Verifies and removes the expectations on mock_obj;
+// also removes the default actions set by ON_CALL();
+// returns true iff successful.
+Mock::VerifyAndClear(&mock_obj);
+}}}
