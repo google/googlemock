@@ -396,7 +396,7 @@ implementation for the file operation part, which suggests that
 `System` is taking on too many roles.
 
 Instead, you can define a `FileOps` interface and an `IOOps` interface
-and split =System='s functionalities into the two. Then you can mock
+and split `System`'s functionalities into the two. Then you can mock
 `IOOps` without mocking `FileOps`.
 
 ===  Delegating Calls to a Real Object ===
