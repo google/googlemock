@@ -1,4 +1,5 @@
 #summary Google Mock Cookbook.
+#labels Featured
 
 = Google Mock Cookbook =
 
