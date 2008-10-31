@@ -119,6 +119,9 @@ class MockPacketStream {
 Note that the mock class doesn't define `AppendPacket()`, unlike the
 real class. That's fine as long as the test doesn't need to call it.
 
+This technique can only be used in *template* code, as shown in the above
+example.
+
 ===  Nice Mocks and Strict Mocks ===
 
 If a mock method has no `EXPECT_CALL` spec but is called, Google Mock
