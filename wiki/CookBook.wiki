@@ -972,8 +972,8 @@ If you are not interested in how a mock method is called, just don't
 say anything about it. In this case, if the method is ever called,
 Google Mock will perform its default action to allow the test program
 to continue. If you are not happy with the default action taken by
-Google Mock, remember that you can override it using
-`DefaultValue<T>::Set()` or `ON_CALL()`.
+Google Mock, you can override it using `DefaultValue<T>::Set()`
+(described later in this document) or `ON_CALL()`.
 
 Please note that once you expressed interest in a particular mock
 method (via `EXPECT_CALL()`), all invocations to it must match some
@@ -1342,7 +1342,6 @@ class MockFoo : public Foo {
 };
 
 int CalculateSum(int x, int y) { return x + y; }
-int Sum3(int x, int y, int z) { return x + y + z; }
 
 class Helper {
  public:
@@ -1358,7 +1357,6 @@ class Helper {
       .WillOnce(Invoke(&helper, &Helper::ComplexJob));
 
   foo.Sum(5, 6);       // Invokes CalculateSum(5, 6).
-  foo.Sum(2, 3);       // Invokes Sum3(1, 2, 3).
   foo.ComplexJob(10);  // Invokes helper.ComplexJob(10);
 }}}
 
@@ -1395,7 +1393,6 @@ class MockFoo : public Foo {
 };
 
 bool Job1() { ... }
-bool Job2(int n, char c) { ... }
 ...
 
   MockFoo foo;
@@ -1403,7 +1400,6 @@ bool Job2(int n, char c) { ... }
       .WillOnce(InvokeWithoutArgs(Job1));
 
   foo.ComplexJob(10);  // Invokes Job1().
-  foo.ComplexJob(20);  // Invokes Job2(5, 'a').
 }}}
 
 ===  Invoking an Argument of the Mock Function ===
