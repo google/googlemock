@@ -1,7 +1,7 @@
-#summary Google Mock Cookbook.
+#summary Google C++ Mocking Framework Cookbook
 #labels Featured
 
-= Google Mock Cookbook =
+<wiki:toc max_depth="3" />
 
 You can find recipes for using Google Mock here. If you haven't yet,
 please read the ForDummies document first to make sure you understand
@@ -13,9 +13,9 @@ your file before using the name `Foo` defined by Google Mock. We omit
 such `using` statements in this page for brevity, but you should do it
 in your own code.
 
-==  Creating Mock Classes ==
+=  Creating Mock Classes =
 
-===  Mocking Overloaded Methods ===
+==  Mocking Overloaded Methods ==
 
 You can mock overloaded functions as usual. No special attention is required:
 
@@ -59,7 +59,7 @@ class MockFoo : public Foo {
 };
 }}}
 
-===  Mocking Class Templates ===
+==  Mocking Class Templates ==
 
 To mock a class template, append `_T` to the `MOCK_*` macros:
 
@@ -82,7 +82,7 @@ class MockStack : public StackInterface<Elem> {
 };
 }}}
 
-===  Mocking Non-virtual Methods ===
+==  Mocking Non-virtual Methods ==
 
 Google Mock can mock non-virtual functions to be used in what we call _hi-perf
 dependency injection_.
@@ -122,7 +122,7 @@ real class. That's fine as long as the test doesn't need to call it.
 This technique can only be used in *template* code, as shown in the above
 example.
 
-===  Nice Mocks and Strict Mocks ===
+==  Nice Mocks and Strict Mocks ==
 
 If a mock method has no `EXPECT_CALL` spec but is called, Google Mock
 will print a warning about the "uninteresting call". The rationale is:
@@ -207,7 +207,7 @@ class. If an important change is made in the interface you are mocking
 explicit `EXPECT_CALL` first, and only turn to `NiceMock` or
 `StrictMock` as the last resort.
 
-===  Simplifying the Interface without Breaking Existing Code ===
+==  Simplifying the Interface without Breaking Existing Code ==
 
 Sometimes a method has a long list of arguments that is mostly
 uninteresting. For example,
@@ -256,7 +256,7 @@ class ScopedMockLog : public LogSink {
 By defining a new mock method with a trimmed argument list, we make
 the mock class much more user-friendly.
 
-===  Alternative to Mocking Concrete Classes ===
+==  Alternative to Mocking Concrete Classes ==
 
 Often you may find yourself using classes that don't implement
 interfaces. In order to test your code that uses such a class (let's
@@ -305,7 +305,7 @@ problem, but I'd like to assure you that the Java community has been
 practicing this for a long time and it's a proven effective technique
 applicable in a wide variety of situations. :-)
 
-===  Delegating Calls to a Fake ===
+==  Delegating Calls to a Fake ==
 
 Some times you have a non-trivial fake implementation of an
 interface. For example:
@@ -402,7 +402,7 @@ Instead, you can define a `FileOps` interface and an `IOOps` interface
 and split `System`'s functionalities into the two. Then you can mock
 `IOOps` without mocking `FileOps`.
 
-===  Delegating Calls to a Real Object ===
+==  Delegating Calls to a Real Object ==
 
 When using testing doubles (mocks, fakes, stubs, and etc), sometimes
 their behaviors will differ from those of the real objects. This
@@ -451,9 +451,9 @@ of times, etc), and a real object will answer the calls (so the
 behavior will be the same as in production). This gives you the best
 of both worlds.
 
-==  Using Matchers ==
+=  Using Matchers =
 
-===  Matching Argument Values Exactly ===
+==  Matching Argument Values Exactly ==
 
 You can specify exactly which arguments a mock method is expecting:
   
@@ -463,7 +463,7 @@ You can specify exactly which arguments a mock method is expecting:
   EXPECT_CALL(foo, DoThat("Hello", bar));
 }}}
 
-===  Using Simple Matchers ===
+==  Using Simple Matchers ==
 
 You can use matchers to match arguments that have a certain property:
 
@@ -480,7 +480,7 @@ A frequently used matcher is `_`, which matches anything:
   EXPECT_CALL(foo, DoThat(_, NotNull()));
 }}}
 
-===  Combining Matchers ===
+==  Combining Matchers ==
 
 You can build complex matchers from existing ones using `AllOf()`,
 `AnyOf()`, and `Not()`:
@@ -495,7 +495,7 @@ You can build complex matchers from existing ones using `AllOf()`,
                           NULL));
 }}}
 
-===  Casting Matchers ===
+==  Casting Matchers ==
 
 Google Mock matchers are statically typed, meaning that the compiler
 can catch your mistake if you use a matcher of the wrong type (for
@@ -533,7 +533,7 @@ class MockFoo : public Foo {
   EXPECT_CALL(foo, DoThis(MatcherCast<Derived*>(m)));
 }}}
 
-===  Selecting Between Overloaded Functions ===
+==  Selecting Between Overloaded Functions ==
 
 If you expect an overloaded function to be called, the compiler may
 need some help on which overloaded version it is.
@@ -586,7 +586,7 @@ TEST(PrinterTest, Print) {
 }
 }}}
 
-===  Performing Different Actions Based on the Arguments ===
+==  Performing Different Actions Based on the Arguments ==
 
 When a mock method is called, the _last_ matching expectation that's
 still active will be selected (think "newer overrides older"). So, you
@@ -606,7 +606,7 @@ like this:
 Now, if `foo.DoThis()` is called with a value less than 5, `'a'` will
 be returned; otherwise `'b'` will be returned.
 
-===  Matching Multiple Arguments as a Whole ===
+==  Matching Multiple Arguments as a Whole ==
 
 Sometimes it's not enough to match the arguments individually. For
 example, we may want to say that the first argument must be less than
@@ -630,7 +630,7 @@ convenience and example, Google Mock provides some matchers for
 2-tuples, including the `Lt()` matcher above. See the CheatSheet for the
 complete list.
 
-===  Using Matchers as Predicates ===
+==  Using Matchers as Predicates ==
 
 Have you noticed that a matcher is just a fancy predicate that also
 knows how to describe itself? Many existing algorithms take predicates
@@ -661,7 +661,7 @@ number that is >= 0, <= 100, and != 50:
 Matches(AllOf(Ge(0), Le(100), Ne(50)))
 }}}
 
-===  Using Matchers in Google Test Assertions ===
+==  Using Matchers in Google Test Assertions ==
 
 Since matchers are basically predicates that also know how to describe
 themselves, there is a way to take advantage of them in
@@ -711,7 +711,7 @@ Expected: starts with "Hello"
 [http://code.google.com/p/hamcrest/ Hamcrest] project, which adds
 `assertThat()` to JUnit.
 
-===  Using Predicates as Matchers ===
+==  Using Predicates as Matchers ==
 
 Google Mock provides a built-in set of matchers. In case you find them
 lacking, you can use an arbitray unary predicate function or functor
@@ -731,7 +731,7 @@ Note that the predicate function / functor doesn't have to return
 `bool`. It works as long as the return value can be used as the
 condition in statement `if (condition) ...`.
 
-===  Matching Arguments that Are Not Copyable ===
+==  Matching Arguments that Are Not Copyable ==
 
 When you do an `EXPECT_CALL(mock_obj, Foo(bar))`, Google Mock saves
 away a copy of `bar`. When `Foo()` is called later, Google Mock
@@ -758,7 +758,7 @@ save a reference to `bar`, instead of a copy of it. Here's how:
 Remember: if you do this, don't change `bar` after the
 `EXPECT_CALL()`, or the result is undefined.
 
-===  Validating a Member of an Object ===
+==  Validating a Member of an Object ==
 
 Often a mock function takes a reference to object as an argument. When
 matching the argument, you may not want to compare the entire object
@@ -802,7 +802,7 @@ the match will always fail regardless of the inner matcher.
 What if you want to validate more than one members at the same time?
 Remember that there is `AllOf()`.
 
-===  Validating the Value Pointed to by a Pointer Argument ===
+==  Validating the Value Pointed to by a Pointer Argument ==
 
 C++ functions often take pointers as arguments. You can use matchers
 like `NULL`, `NotNull()`, and other comparison matchers to match a
@@ -838,7 +838,7 @@ nested `Pointee()` to probe deeper inside the value. For example,
 `Pointee(Pointee(Lt(3)))` matches a pointer that points to a pointer
 that points to a number less than 3 (what a mouthful...).
 
-===  Testing a Certain Property of an Object ===
+==  Testing a Certain Property of an Object ==
 
 Sometimes you want to specify that an object argument has a certain
 property, but there is no existing matcher that does this. If you want
@@ -882,7 +882,7 @@ inline Matcher<const Foo&> BarPlusBazEq(int expected_sum) {
   EXPECT_CALL(..., DoThis(BarPlusBazEq(5)))...;
 }}}
 
-===  Matching Containers ===
+==  Matching Containers ==
 
 Sometimes an STL container (e.g. list, vector, map, ...) is passed to
 a mock function and you may want to validate it. Since most STL
@@ -947,7 +947,7 @@ array size cannot be inferred by the compiler), you can give
   * If the container is passed by pointer instead of by reference, just write `Pointee(ElementsAre*(...))`. 
   * The order of elements _matters_ for `ElementsAre*()`. Therefore don't use it with containers whose element order is undefined (e.g. `hash_map`). 
 
-===  Sharing Matchers ===
+==  Sharing Matchers ==
 
 Under the hood, a Google Mock matcher object consists of a pointer to
 a ref-counted implementation object. Copying matchers is allowed and
@@ -964,9 +964,9 @@ matcher variable and use that variable repeatedly! For example,
   ... use in_range as a matcher in multiple EXPECT_CALLs ...
 }}}
 
-==  Setting Expectations ==
+=  Setting Expectations =
 
-===  Ignoring Uninteresting Calls ===
+==  Ignoring Uninteresting Calls ==
 
 If you are not interested in how a mock method is called, just don't
 say anything about it. In this case, if the method is ever called,
@@ -980,7 +980,7 @@ method (via `EXPECT_CALL()`), all invocations to it must match some
 expectation. If this function is called but the arguments don't match
 any `EXPECT_CALL()` statement, it will be an error.
 
-===  Disallowing Unexpected Calls ===
+==  Disallowing Unexpected Calls ==
 
 If a mock method shouldn't be called at all, explicitly say so:
 
@@ -1001,7 +1001,7 @@ list all the expected calls:
 A call to `foo.Bar()` that doesn't match any of the `EXPECT_CALL()`
 statements will be an error.
 
-===  Expecting Ordered Calls ===
+==  Expecting Ordered Calls ==
 
 Although an `EXPECT_CALL()` statement defined earlier takes precedence
 when Google Mock tries to match a function call with an expectation,
@@ -1032,7 +1032,7 @@ calls to `bar.DoThat()` where the argument can be anything, which are
 in turn followed by a call to `foo.DoThis(6)`. If a call occurred
 out-of-order, Google Mock will report an error.
 
-===  Expecting Partially Ordered Calls ===
+==  Expecting Partially Ordered Calls ==
 
 Sometimes requiring everything to occur in a predetermined order can
 lead to brittle tests. For example, we may care about `A` occurring
@@ -1085,7 +1085,7 @@ C -> D`):
 This means that A must occur before B and C, and C must occur before
 D. There's no restriction about the order other than these.
 
-===  Controlling When an Expectation Retires ===
+==  Controlling When an Expectation Retires ==
 
 When a mock method is called, Google Mock only consider expectations
 that are still active. An expectation is active when created, and
@@ -1132,9 +1132,9 @@ Here #2 can be used only once, so if you have two warnings with the
 message `"File too large."`, the first will match #2 and the second
 will match #1 - there will be no error.
 
-==  Using Actions ==
+=  Using Actions =
 
-===  Returning References from Mock Methods ===
+==  Returning References from Mock Methods ==
 
 If a mock function's return type is a reference, you need to use
 `ReturnRef()` instead of `Return()` to return a result:
@@ -1152,7 +1152,7 @@ class MockFoo : public Foo {
       .WillOnce(ReturnRef(bar));
 }}}
 
-===  Combining Actions ===
+==  Combining Actions ==
 
 Want to do more than one thing when a function is called? That's
 fine. `DoAll()` allow you to do sequence of actions every time. Only
@@ -1172,7 +1172,7 @@ class MockFoo : public Foo {
                       action_n));
 }}}
 
-===  Mocking Side Effects ===
+==  Mocking Side Effects ==
 
 Sometimes a method exhibits its effect not via returning a value but
 via side effects. For example, it may change some global state or
@@ -1259,7 +1259,7 @@ class MockRolodex : public Rolodex {
       .WillOnce(SetArrayArgument<0>(names.begin(), names.end()));
 }}}
 
-===  Setting the Default Value for a Return Type ===
+==  Setting the Default Value for a Return Type ==
 
 If a mock method's return type is a built-in C++ type or pointer, by
 default it will return 0 when invoked. You only need to specify an
@@ -1298,7 +1298,7 @@ tests hard to understand. We recommend you to use this feature
 judiciously. For example, you may want to make sure the `Set()` and
 `Clear()` calls are right next to the code that uses your mock.
 
-===  Setting the Default Actions for a Mock Method ===
+==  Setting the Default Actions for a Mock Method ==
 
 You've learned how to change the default value of a given
 type. However, this may be too coarse for your purpose: perhaps you
@@ -1329,7 +1329,7 @@ be used. This matching order allows you to set up the common behavior
 in a mock object's constructor or the test fixture's set-up phase and
 specialize the mock's behavior later.
 
-===  Using Functions/Methods/Functors as Actions ===
+==  Using Functions/Methods/Functors as Actions ==
 
 If the built-in actions don't suit you, you can easily use an existing
 function, method, or functor as an action:
@@ -1368,7 +1368,7 @@ implicitly converted to that of the latter. So, you can invoke
 something whose type is _not_ exactly the same as the mock function,
 as long as it's safe to do so - nice, huh?
 
-===  Invoking a Function/Method/Functor Without Arguments ===
+==  Invoking a Function/Method/Functor Without Arguments ==
 
 `Invoke()` is very useful for doing actions that are more complex. It
 passes the mock function's arguments to the function or functor being
@@ -1402,7 +1402,7 @@ bool Job1() { ... }
   foo.ComplexJob(10);  // Invokes Job1().
 }}}
 
-===  Invoking an Argument of the Mock Function ===
+==  Invoking an Argument of the Mock Function ==
 
 Sometimes a mock function will receive a function pointer or a functor
 (in other words, a "callable") as an argument, e.g.
@@ -1496,7 +1496,7 @@ using testing::InvokeArgument;
   // are kept inside the InvokeArgument action.
 }}}
 
-===  Ignoring an Action's Result ===
+==  Ignoring an Action's Result ==
 
 Sometimes you have an action that returns _something_, but you need an
 action that returns `void` (perhaps you want to use it in a mock
@@ -1531,7 +1531,7 @@ class MockFoo : public Foo {
 Note that you *cannot* use `IgnoreResult()` on an action that already
 returns `void`. Doing so will lead to ugly compiler errors.
 
-===  Selecting an Action's Arguments ===
+==  Selecting an Action's Arguments ==
 
 Say you have a mock function `Foo()` that takes seven arguments, and
 you have a custom action that you want to invoke when `Foo()` is
@@ -1603,7 +1603,7 @@ Here are more tips:
   * You can change the order of the arguments, e.g. `WithArgs<3, 2, 1>(...)`. 
   * The types of the selected arguments do _not_ have to match the signature of the inner action exactly. It works as long as they can be implicitly converted to the corresponding arguments of the inner action. For example, if the 4-th argument of the mock function is an `int` and `my_action` takes a `double`, `WithArg<4>(my_action)` will work. 
 
-===  Ignoring Arguments in Action Functions ===
+==  Ignoring Arguments in Action Functions ==
 
 The selecting-an-action's-arguments recipe showed us one way to make a
 mock function and an action with incompatible argument lists fit
@@ -1657,7 +1657,7 @@ double DistanceToOrigin(Unused, double x, double y) {
       .WillOnce(Invoke(DistanceToOrigin));
 }}}
 
-===  Sharing Actions ===
+==  Sharing Actions ==
 
 Just like matchers, a Google Mock action object consists of a pointer
 to a ref-counted implementation object. Therefore copying actions is
@@ -1709,9 +1709,9 @@ versus
   foo.DoThat();  // Returns 3 - the counter is shared.
 }}}
 
-==  Misc Recipes on Using Google Mock ==
+=  Misc Recipes on Using Google Mock =
 
-===  Invoking the Real Implementation of a Mocked Function ===
+==  Invoking the Real Implementation of a Mocked Function ==
 
 Ideally, you should code to interfaces, whose methods are all pure
 virtual. In reality, sometimes you do need to mock a virtual method
@@ -1776,7 +1776,7 @@ that, `MockFoo::Concrete()` will be called (and cause an infinite
 recursion) since `Foo::Concrete()` is virtual. That's just how C++
 works.)
 
-===  Forcing a Verification ===
+==  Forcing a Verification ==
 
 When it's being destoyed, your friendly mock object will automatically
 verify that all expectations on it have been satisfied, and will
@@ -1820,7 +1820,7 @@ TEST(MyServerTest, ProcessesRequest) {
 yes), so you can wrap that function call inside a `ASSERT_TRUE()` if
 there is no point going further when the verification has failed.
 
-===  Using Check Points ===
+==  Using Check Points ==
 
 Sometimes you may want to "reset" a mock object at various check
 points in your test: at each check point, you verify that all existing
@@ -1889,7 +1889,7 @@ and nothing should happen between the two check points. The explicit
 check points make it easy to tell which `Bar("a")` is called by which
 call to `Foo()`.
 
-===  Mocking Destructors ===
+==  Mocking Destructors ==
 
 Sometimes you want to make sure a mock object is destructed at the
 right time, e.g. after `bar->A()` is called but before `bar->B()` is
@@ -1938,7 +1938,7 @@ object dies to testing when its `Die()` method is called:
 
 And that's that.
 
-===  Using Google Mock and Threads ===
+==  Using Google Mock and Threads ==
 
 *IMPORTANT NOTE:* What we describe in this recipe is *NOT* true yet,
 as Google Mock is not currently thread-safe.  However, all we need to
@@ -2000,7 +2000,7 @@ potentially affects _all_ living mock objects in your
 program. Naturally, you won't want to mess with it from multiple
 threads or when there still are mocks in action.
 
-===  Controlling How Much Information Google Mock Prints ===
+==  Controlling How Much Information Google Mock Prints ==
 
 When Google Mock sees something that has the potential of being an
 error (e.g. a mock function with no expectation is called, which is
@@ -2033,7 +2033,7 @@ tests like so:
 
 Now, judiciously use the right flag to enable Google Mock serve you better!
 
-===  Running Tests in Emacs ===
+==  Running Tests in Emacs ==
 
 If you build and run your tests in Emacs, the source file locations of
 Google Mock and [http://code.google.com/p/googletest/ Google Test]
@@ -2053,9 +2053,9 @@ To make it even easier, you can add the following lines to your
 Then you can type `M-m` to start a build, or `M-up`/`M-down` to move
 back and forth between errors.
 
-==  Extending Google Mock ==
+=  Extending Google Mock =
 
-===  Writing New Matchers ===
+==  Writing New Matchers ==
 
 A matcher of argument type `T` implements
 `testing::MatcherInterface<T>` and does two things: it tests whether a
@@ -2121,7 +2121,7 @@ inline Matcher<int> Even() {
   EXPECT_CALL(foo, Bar(Even()));
 }}}
 
-===  Writing New Polymorphic Matchers ===
+==  Writing New Polymorphic Matchers ==
 
 You've learned how to write your own matchers here. Just one problem:
 a matcher created using `MakeMatcher()` only works for one particular
@@ -2172,7 +2172,7 @@ inline PolymorphicMatcher<NotNullMatcher> NotNull() {
 `MatcherInterface` or any other class, and its methods do *not* need
 to be virtual.
 
-===  Writing a Matcher that Generates Informative Messages ===
+==  Writing a Matcher that Generates Informative Messages ==
 
 When a mock function argument fails to match an expectation, Google
 Mock will print the matcher description and the argument, for example:
@@ -2269,7 +2269,7 @@ this is useful when the matcher is used inside `Not()`. There is no
 need to print the argument value itself in `ExplainMatchResultTo()`,
 as Google Mock already prints it elsewhere.
 
-===  Writing New Cardinalities ===
+==  Writing New Cardinalities ==
 
 A cardinality is used in `Times()` to tell Google Mock how many times
 you expect a call to occur. It doesn't have to be exact. For example,
@@ -2327,7 +2327,7 @@ Cardinality EvenNumber() {
       .Times(EvenNumber());
 }}}
 
-===  Writing New Actions ===
+==  Writing New Actions ==
 
 If the built-in actions don't work for you, and it's inconvenient to
 use `Invoke()`, you can make an action that does whatever you want by
@@ -2373,7 +2373,7 @@ Action<IncrementMethod> IncrementArgument() {
   foo.Baz(&n);  // Should return 5 and change n to 6.
 }}}
 
-===  Writing New Polymorphic Actions ===
+==  Writing New Polymorphic Actions ==
 
 The previous recipe showed you how to define your own action. This is
 all good, except that you need to know the type of the function in
@@ -2452,7 +2452,7 @@ class MockFoo : public Foo {
   foo.DoThat(1, "Hi", "Bye");  // Will return "Hi".
 }}}
 
-===  Teaching Google Mock How to Print Your Values ===
+==  Teaching Google Mock How to Print Your Values ==
 
 When an uninteresting or unexpected call occurs, Google Mock prints
 the argument values to help you debug. Google Mock does this using the
