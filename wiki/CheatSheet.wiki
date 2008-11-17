@@ -1,11 +1,11 @@
-#summary Google Mock Cheat Sheet.
+#summary Google C++ Mocking Framework Cheat Sheet
 #labels Featured
 
-= Google Mock Cheat Sheet =
+<wiki:toc max_depth="3" />
 
-== Defining a Mock Class ==
+= Defining a Mock Class =
 
-=== Mocking a Normal Class ===
+== Mocking a Normal Class ==
 
 Given
 {{{
@@ -37,7 +37,7 @@ NiceMock<MockFoo> nice_foo;     // The type is a subclass of MockFoo.
 StrictMock<MockFoo> strict_foo; // The type is a subclass of MockFoo.
 }}}
 
-=== Mocking a Class Template ===
+== Mocking a Class Template ==
 
 To mock
 {{{
@@ -59,7 +59,7 @@ class MockStack : public StackInterface<Elem> {
 };
 }}}
 
-=== Specifying Calling Conventions for Mock Functions ===
+== Specifying Calling Conventions for Mock Functions ==
 
 If your mock function doesn't use the default calling convention, you
 can specify it by appending `_WITH_CALLTYPE` to any of the macros
@@ -71,7 +71,7 @@ convention as the first argument to the macro. For example,
 }}}
 where `STDMETHODCALLTYPE` is defined by `<objbase.h>` on Windows.
 
-== Using Mocks in Tests ==
+= Using Mocks in Tests =
 
 The typical flow is:
   # Import the Google Mock names you need to use. All Google Mock names are in the `testing` namespace unless they are macros or otherwise noted.
@@ -101,7 +101,7 @@ TEST(BarTest, DoesThis) {
 }                                                 // #6
 }}}
 
-== Setting Default Actions ==
+= Setting Default Actions =
 
 Google Mock has a *built-in default action* for any function that
 returns `void`, `bool`, a numeric value, or a pointer.
@@ -122,7 +122,7 @@ ON_CALL(mock_object, method(matchers))
     .WillByDefault(action);
 }}}
 
-== Setting Expectations ==
+= Setting Expectations =
 
 `EXPECT_CALL()` sets *expectations* on a mock method (How will it be
 called? What will it do?):
@@ -144,17 +144,17 @@ If `Times()` is omitted, the cardinality is assumed to be:
 
 A method with no `EXPECT_CALL()` is free to be invoked _any number of times_, and the default action will be taken each time.
 
-== Matchers ==
+= Matchers =
 
 A *matcher* matches a _single_ argument. Built-in matchers (where
 `argument` is the function argument) are divided into several
 categories:
 
-=== Wildcard ===
+== Wildcard ==
 ||`_`||`argument` can be any value of the correct type.||
 ||`A<type>()` or `An<type>()`||`argument` can be any value of type `type`. ||
 
-=== Generic Comparison ===
+== Generic Comparison ==
 
 ||`Eq(value)` or `value`||`argument == value`||
 ||`Ge(value)`||`argument >= value`||
@@ -174,7 +174,7 @@ e.g. `Eq(ByRef(non_copyable_value))`. If you do that, make sure
 `non_copyable_value` is not changed afterwards, or the meaning of your
 matcher will be changed.
 
-=== Floating-Point Matchers ===
+== Floating-Point Matchers ==
 
 ||`DoubleEq(a_double)`||`argument` is a `double` value approximately equal to `a_double`.||
 ||`FloatEq(a_float)`||`argument` is a `float` value approximately equal to `a_float`.||
@@ -184,7 +184,7 @@ used in [http://code.google.com/p/googletest/ Google Test]). They
 automatically pick a reasonable error bound based on the absolute
 value of the expected value.
 
-=== String Matchers ===
+== String Matchers ==
 
 The `argument` can be either a C string or a C++ string object:
 
@@ -201,7 +201,7 @@ The `argument` can be either a C string or a C++ string object:
 `StrCaseEq()`, `StrCaseNe()`, `StrEq()`, and `StrNe()` work for wide
 strings as well.
 
-=== Container Matchers ===
+== Container Matchers ==
 
 Most STL-style containers support `==`, so you can use
 `Eq(expected_container)` or simply `expected_container` to match a
@@ -211,24 +211,24 @@ them more flexibly, you can use:
 ||`ElementsAre(e0, e1, ..., en)`||`argument` has `n + 1` elements, where the i-th element matches `ei`, which can be a value or a matcher. 0 to 10 arguments are allowed.||
 ||`ElementsAreArray(array)` or `ElementsAreArray(array, count)`||The same as `ElementsAre()` except that the expected element values/matchers come from a C-style array.||
 
-=== Member Matchers ===
+== Member Matchers ==
 
 ||`Field(&class::field, m)`||`argument.field` (or `argument->field` when `argument` is a plain pointer) matches matcher `m`, where `argument` is an object of type _class_.||
 ||`Property(&class::property, m)`||`argument.property()` (or `argument->property()` when `argument` is a plain pointer) matches matcher `m`, where `argument` is an object of type _class_.||
 
-=== Matching the Result of a Function or Functor ===
+== Matching the Result of a Function or Functor ==
 
 ||`ResultOf(f, m)`||`f(argument)` matches matcher `m`, where `f` is a function or functor.||
 
-=== Pointer Matchers ===
+== Pointer Matchers ==
 
 ||`Pointee(m)`||`argument` (either a smart pointer or a raw pointer) points to a value that matches matcher `m`.||
 
-=== Using a Function or Functor as a Matcher ===
+== Using a Function or Functor as a Matcher ==
 
 ||`Truly(predicate)`||`predicate(argument)` returns something considered by C++ to be true, where `predicate` is a function or functor.||
 
-=== Multi-argument Matchers ===
+== Multi-argument Matchers ==
 
 These are matchers on tuple types. They can be used in `.WithArguments()`. The following can be used on functions with _two arguments_:
 
@@ -239,7 +239,7 @@ These are matchers on tuple types. They can be used in `.WithArguments()`. The f
 ||`Lt()`||`arg1 < arg2`||
 ||`Ne()`||`arg1 != arg2`||
 
-=== Composite Matchers ===
+== Composite Matchers ==
 
 You can make a matcher from one or more other matchers:
 
@@ -247,35 +247,35 @@ You can make a matcher from one or more other matchers:
 ||`AnyOf(m1, m2, ..., mn)`||`argument` matches at least one of the matchers `m1` to `mn`.||
 ||`Not(m)`||`argument` doesn't match matcher `m`.||
 
-=== Casting a Matcher ===
+== Casting a Matcher ==
 
 ||`MatcherCast<T>(m)`||casts matcher `m` to type `Matcher<T>`.||
 
-=== Matchers as Predicates ===
+== Matchers as Predicates ==
 
 As a nice gesture, Google Mock lets you turn a matcher `m` into a
 unary predicate (as used in various algorithms in STL) using
 `Matches(m)`.
 
-== Actions ==
+= Actions =
 
 *Actions* specify what a mock function should do when invoked.
 
-=== Returning a Value ===
+== Returning a Value ==
 
 ||`Return()`||Return from a `void` mock function.||
 ||`Return(value)`||Return `value`.||
 ||`ReturnNull()`||Return a null pointer.||
 ||`ReturnRef(variable)`||Return a reference to `variable`.||
 
-=== Side Effects ===
+== Side Effects ==
 
 ||`Assign(&variable, value)`||Assign `value` to variable.||
 ||`SetArgumentPointee<N>(value)`||Assign `value` to the variable pointed by the `N`-th (0-based) argument.||
 ||`SetArrayArgument<N>(first, last)`||Copies the elements in source range [`first`, `last`) to the array pointed to by the `N`-th (0-based) argument, which can be either a pointer or an iterator. The action does not take ownership of the elements in the source range.||
 ||`SetErrnoAndReturn(error, value)`||Set `errno` to `error` and return `value`.||
 
-=== Using a Function or a Functor as an Action ===
+== Using a Function or a Functor as an Action ==
 
 ||`Invoke(f)`||Invoke `f` with the arguments passed to the mock function, where `f` can be a global/static function or a functor.||
 ||`Invoke(object_pointer, &class::method)`||Invoke the {method on the object with the arguments passed to the mock function.||
@@ -296,13 +296,13 @@ In `InvokeArgument<N>(...)`, if an argument needs to be passed by reference, wra
 }}}
 calls the mock function's #2 argument, passing to it `5` and `string("Hi")` by value, and `foo` by reference.
 
-=== Default Action ===
+== Default Action ==
 
 ||`DoDefault()`||Do the default action (specified by `ON_CALL()` or the built-in one).||
 
 *Note:* due to technical reasons, `DoDefault()` cannot be used inside  a composite action - trying to do so will result in a run-time error.
 
-=== Composite Actions ===
+== Composite Actions ==
 
 ||`DoAll(a1, a2, ..., an)`||Do all actions `a1` to `an` in each invocation.||
 ||`IgnoreResult(a)`||Perform action `a` and ignore its result. `a` must not return void.||
@@ -310,7 +310,7 @@ calls the mock function's #2 argument, passing to it `5` and `string("Hi")` by v
 ||`WithArgs<N1, N2, ..., Nk>(a)`||Pass the selected (0-based) arguments of the mock function to action `a` and perform it.||
 ||`WithoutArgs(a)`||Perform action `a` without any arguments.||
 
-== Cardinalities ==
+= Cardinalities =
 
 These are used in `Times()` to specify how many times a mock function will be called:
 
@@ -320,7 +320,7 @@ These are used in `Times()` to specify how many times a mock function will be ca
 ||`Between(m, n)`||The call is expected between `m` and `n` (inclusive) times.||
 ||`Exactly(n) or n`||The call is expected exactly `n` times. In particular, the call should never happen when `n` is 0.||
 
-== Sequences ==
+= Sequences =
 
 *Sequences* specify the order of expectations. _All expected calls_ in
 the same sequence must occur in the order they are specified;
@@ -361,7 +361,7 @@ To put many expectations in a sequence conveniently:
 (All expected calls in the scope of `dummy` must occur in strict
 order. The name `dummy` is irrelevant.)
 
-== Verifying and Resetting a Mock ==
+= Verifying and Resetting a Mock =
 
 Google Mock will verify the expectations on a mock object when it is destructed, or you can do it earlier:
 {{{
