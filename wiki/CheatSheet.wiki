@@ -176,13 +176,18 @@ matcher will be changed.
 
 == Floating-Point Matchers ==
 
-||`DoubleEq(a_double)`||`argument` is a `double` value approximately equal to `a_double`.||
-||`FloatEq(a_float)`||`argument` is a `float` value approximately equal to `a_float`.||
+||`DoubleEq(a_double)`||`argument` is a `double` value approximately equal to `a_double`, treating two !NaNs as unequal.||
+||`FloatEq(a_float)`||`argument` is a `float` value approximately equal to `a_float`, treating two !NaNs as unequal.||
+||`NanSensitiveDoubleEq(a_double)`||`argument` is a `double` value approximately equal to `a_double`, treating two !NaNs as equal.||
+||`NanSensitiveFloatEq(a_float)`||`argument` is a `float` value approximately equal to `a_float`, treating two !NaNs as equal.||
 
-`DoubleEq()` and `FloatEq()` use ULP-based comparison (the same as
-used in [http://code.google.com/p/googletest/ Google Test]). They
+These matchers use ULP-based comparison (the same as used in
+[http://code.google.com/p/googletest/ Google Test]). They
 automatically pick a reasonable error bound based on the absolute
-value of the expected value.
+value of the expected value.  `DoubleEq()` and `FloatEq()` conform to
+the IEEE standard, which requires comparing two !NaNs for equality to
+return false. The `NanSensitive*` version instead treats two !NaNs as
+equal, which is often what a user wants.
 
 == String Matchers ==
 
