@@ -6,7 +6,7 @@
 Please send your questions to the
 [http://groups.google.com/group/googlemock googlemock] discussion
 group. If you need help with compiler errors, make sure you have
-tried [#These_template_errors_are_driving_me_crazy_How_am_I_supposed_to Google Mock Doctor] first.
+tried [#These_template_errors_are_driving_me_crazy._How_am_I_supposed_to Google Mock Doctor] first.
 
 == These template errors are driving me crazy. How am I supposed to make sense of them? ==
 
