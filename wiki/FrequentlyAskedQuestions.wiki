@@ -6,9 +6,9 @@
 Please send your questions to the
 [http://groups.google.com/group/googlemock googlemock] discussion
 group. If you need help with compiler errors, make sure you have
-tried [#These_template_errors_are_driving_me_crazy_-_How_am_I_supposed_to Google Mock Doctor] first.
+tried [#How_am_I_supposed_to_make_sense_of_these_horrible_template_error Google Mock Doctor] first.
 
-== These template errors are driving me crazy - how am I supposed to make sense of them? ==
+== How am I supposed to make sense of these horrible template errors? ==
 
 If you are confused by the compiler errors gcc threw at you,
 try consulting the _Google Mock Doctor_ tool first.  What it does is to
