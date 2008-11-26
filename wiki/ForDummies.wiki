@@ -137,6 +137,13 @@ TEST(PainterTest, CanDrawSomething) {
 
   EXPECT_TRUE(painter.DrawCircle(0, 0, 10));
 }                                             // #5
+
+int main(int argc, char** argv) {
+  // The following line must be executed to initialize Google Mock
+  // (and Google Test) before running the tests.
+  testing::InitGoogleMock(&argc, argv);
+  return RUN_ALL_TESTS();
+}
 }}}
 
 As you might have guessed, this test checks that `PenDown()` is called at least once. If the `painter` object didn't call this method, your test will fail with a message like this:
