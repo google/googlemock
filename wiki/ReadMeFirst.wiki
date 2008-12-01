@@ -3,19 +3,26 @@
 
 Welcome to Google C++ Mocking Framework!
 
-*Google C++ Mocking Framework* (or *Google Mock* for short) is a library
-for writing and using C++ mock classes.  We have enjoyed it in many
-projects at Google, and hope you find it useful too.
+Inspired by [http://www.jmock.org/ jMock], [http://www.easymock.org/ EasyMock], and [http://code.google.com/p/hamcrest/ Hamcrest], *Google C++ Mocking
+Framework* (or *Google Mock* for short) is a library for writing and
+using C++ mock classes.  We have enjoyed it in many projects at
+Google, and hope you find it useful too.
 
 If you are new to the project, we suggest to read the user
 documentation in the following order:
 
-  # [http://code.google.com/p/googletest/wiki/GoogleTestPrimer GoogleTestPrimer] - teaches the basics of [http://code.google.com/p/googletest/ Google C++ Testing Framework], which is currently required by Google Mock.  (Eventually we plan to support using Google Mock with other C++ testing frameworks.)
-  # ForDummies - gets you started with Google Mock.
-  # CheatSheet - all the commonly used stuff at a glance.
-  # CookBook - recipes for getting things done, including advanced techniques.
-  # FrequentlyAskedQuestions - please check here first before posting a question on the [http://groups.google.com/group/googlemock googlemock] discussion group.
+  * Learn the [http://code.google.com/p/googletest/wiki/GoogleTestPrimer basics] of [http://code.google.com/p/googletest/ Google C++ Testing Framework], which is currently required by Google Mock.  (Eventually we plan to support using Google Mock with other C++ testing frameworks.)
+  * Read [ForDummies Google Mock for Dummies].
+  * Read the instructions on how to [http://code.google.com/p/googlemock/source/browse/#svn/trunk/README build Google Mock].
 
-If you want to contribute to the development of Google Mock, please read the DevGuide.
+Once you understand the basics, check out the rest of the docs:
+
+  * CheatSheet - all the commonly used stuff at a glance.
+  * CookBook - recipes for getting things done, including advanced techniques.
+
+If you have problems, please check the FrequentlyAskedQuestions before posting a question on the [http://groups.google.com/group/googlemock googlemock] discussion group.
+
+If you want to contribute to the development of Google Mock, please
+read the DevGuide.
 
 Happy mocking!
