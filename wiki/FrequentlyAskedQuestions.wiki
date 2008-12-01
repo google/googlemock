@@ -8,6 +8,21 @@ Please send your questions to the
 group. If you need help with compiler errors, make sure you have
 tried [#How_am_I_supposed_to_make_sense_of_these_horrible_template_error Google Mock Doctor] first.
 
+== Why does Google Mock insist on using Google Test as the testing framework?  I have my favorite testing framework and don't want to switch. ==
+
+We do plan to decouple Google Mock and Google Test.  The reason they
+are bundled together now is that we haven't found the time to separate
+them yet.  Instead of having everyone waiting indefinitely, we figured
+it's better to release early and allow at least some people to use it.
+
+While we'd like people to use Google Test, we want it to win by its
+own merits, not through bundling.  Google Mock shouldn't be the only
+reason for one to use Google Test.
+
+Since Google Mock is open-source, people are free to contribute to it.
+If you feel strongly about it, please consider reading the DevGuide
+and working on making Google Mock testing-framework-neutral. :-)
+
 == How am I supposed to make sense of these horrible template errors? ==
 
 If you are confused by the compiler errors gcc threw at you,
