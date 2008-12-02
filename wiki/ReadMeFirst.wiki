@@ -8,7 +8,7 @@ Framework* (or *Google Mock* for short) is a library for writing and
 using C++ mock classes.  We have enjoyed it in many projects at
 Google, and hope you find it useful too.
 
-= System Requirements =
+== System Requirements ==
 
 Google Mock depends on advanced C++ features and thus requires a more
 modern compiler.  It has been tested with *gcc 4.0+* and *Microsoft
@@ -21,7 +21,7 @@ particular, `<tr1/tuple>`) installed.  This library comes with gcc
 can download it for free
 [http://www.microsoft.com/downloads/details.aspx?FamilyId=D466226B-8DAB-445F-A7B4-448B326C48E7 here].  Another option is to install the [http://www.boost.org/ boost] C++ libraries, which contain an implementation of `tr1` (we haven't tested this configuration though.).
 
-= Getting Started =
+== Getting Started ==
 
 If you are new to the project, we suggest to read the user
 documentation in the following order:
