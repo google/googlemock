@@ -14,13 +14,13 @@ projects at Google, and hope you find it useful too.
 Google Mock is not a testing framework itself.  Instead, it needs a
 testing framework for writing tests.  Currently Google Mock only works
 with [http://code.google.com/p/googletest/ Google Test], although
-eventually we plan to support other C++ testing frameworks.  You can
-use either the copy of Google Test coming with Google Mock, or
-a compatible version you already have.
+eventually we plan to support other C++ testing frameworks.  Google
+Mock comes with a copy of Google Test bundled, or you can use a
+compatible version that you have already installed.
 
 Google Mock depends on advanced C++ features and thus requires a more
-modern compiler.  It has been tested with *gcc 4.0+* and *Microsoft
-Visual C++ 8.0 SP1*, on *Linux*, *Mac OS X*, and *Windows*.
+modern compiler.  It has been tested with *gcc 4.0+* on *Linux* and
+*Mac OS X*, and *Microsoft Visual C++ 8.0 SP1* on *Windows*.
 
 To use Google Mock, you also need the
 [http://en.wikipedia.org/wiki/Technical_Report_1 tr1] C++ library (in
