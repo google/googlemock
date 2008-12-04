@@ -25,12 +25,9 @@ modern compiler.  It has been tested with *gcc 4.0+* on *Linux* and
 To use Google Mock, you also need the
 [http://en.wikipedia.org/wiki/Technical_Report_1 tr1] C++ library (in
 particular, `<tr1/tuple>`) installed.  This library comes with gcc
-4.0+.  If you use Microsoft Visual C++ and `tr1` is not included, you
-can download it for free
-[http://www.microsoft.com/downloads/details.aspx?FamilyId=D466226B-8DAB-445F-A7B4-448B326C48E7 here].
-Another option is to install the [http://www.boost.org/ boost] C++
-libraries, which contain an implementation of `tr1` (we haven't tested
-this configuration though.).
+4.0+.  If you use Microsoft Visual C++, you can download a copy of
+`tr1` implemented by the [http://www.boost.org/ boost] project (we
+have tested it with [http://www.boost.org/users/news/version_1_36_0 boost version 1.36.0].).
 
 == Getting Started ==
 
