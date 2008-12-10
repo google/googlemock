@@ -105,11 +105,11 @@ class MockTurtle : public Turtle {
 You don't need to define these mock methods somewhere else - the `MOCK_METHOD*` macros will generate the definitions for you. It's that simple! Once you get the hang of it, you can pump out mock classes faster than your source-control system can handle your check-ins (if you are _really_ keen on it).
 
 *Tip:* If even this is too much work for you, you'll find the
-[http://code.google.com/p/googlemock/source/browse/#svn/trunk/scripts/generator/gmock_gen.py gmock_gen.py] tool (courtesy of the [http://code.google.com/p/cppclean/ cppclean] project) useful.  This command-line
+`gmock_gen.py` tool in Google Mock's `scripts/generator/` directory (courtesy of the [http://code.google.com/p/cppclean/ cppclean] project) useful.  This command-line
 tool requires that you have Python 2.4 installed.  You give it a C++ file and the name of an abstract class defined in it,
 and it will print the definition of the mock class for you.  Due to the
 complexity of the C++ language, this script may not always work, but
-it can be quite handy when it does.  For more details, read the [http://code.google.com/p/googlemock/source/browse/#svn/trunk/scripts/generator/README user documentation].
+it can be quite handy when it does.  For more details, read the [http://code.google.com/p/googlemock/source/browse/trunk/scripts/generator/README user documentation].
 
 ==  Where to Put It ==
 When you define a mock class, you need to decide where to put its definition. Some people put it in a `*_test.cc`. This is fine when the interface being mocked (say, `Foo`) is owned by the same person or team. Otherwise, when the owner of `Foo` changes it, your test could break. (You can't really expect `Foo`'s maintainer to fix every test that uses `Foo`, can you?)
