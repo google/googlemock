@@ -1,0 +1,7 @@
+#summary Known problems in Google Mock.
+
+As any non-trivial software system, Google Mock has some known limitations and problems.  We are working on improving it, and welcome your help!  The follow is a list of issues we know about.
+
+== Tests failing on machines using Power PC CPUs (e.g. some Macs) ==
+
+`gmock_output_test` and `gmock-printers_test` are known to fail with Power PC CPUs.  This is due to portability issues with these tests, and is not an indication of problems in Google Mock itself.  You can safely ignore them.
