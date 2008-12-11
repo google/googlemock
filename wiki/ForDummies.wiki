@@ -13,15 +13,15 @@ When you write a prototype or test, often it's not feasible or wise to rely on r
   * *Fake* objects have working implementations, but usually take some shortcut (perhaps to make the operations less expensive), which makes them not suitable for production. An in-memory file system would be an example of a fake. 
   * *Mocks* are objects pre-programmed with _expectations_, which form a specification of the calls they are expected to receive. 
 
-If all this seems too abstract for you, don't worry - the most important thing to remember is that a mock allows you to check the _interaction_ between itself and code that uses it. The difference between fakes and mocks shall become much clearer once you start to use mocks.
+If all this seems too abstract for you, don't worry - the most important thing to remember is that a mock allows you to check the _interaction_ between itself and code that uses it. The difference between fakes and mocks will become much clearer once you start to use mocks.
 
-*Google C++ Mocking Framework* (or *Google Mock* for short) is a library (sometimes we also call it a "framework" to make it sound cool) for creating mock classes and using them. It does to C++ what [http://www.jmock.org/ jMock] and [http://www.easymock.org/ EasyMock] do to Java (well, more or less).
+*Google C++ Mocking Framework* (or *Google Mock* for short) is a library (sometimes we also call it a "framework" to make it sound cool) for creating mock classes and using them. It does to C++ what [http://www.jmock.org/ jMock] and [http://www.easymock.org/ EasyMock] do to Java.  Google Mock currently works with [http://code.google.com/p/googletest/ Google C++ Testing Framework].  We hope to make it work with other testing frameworks as well in the future.
 
-When using Google Mock,
+Using Google Mock involves three basic steps:
  
-  # first, you use some simple macros to describe the interface you want to mock, and they will expand to the implementation of your mock class; 
-  # next, you create some mock objects and specify its expectations and behavior using an intuitive syntax; 
-  # then you exercise code that uses the mock objects. Google Mock will catch any violation to the expectations as soon as it arises. 
+  # Use some simple macros to describe the interface you want to mock, and they will expand to the implementation of your mock class; 
+  # Create some mock objects and specify its expectations and behavior using an intuitive syntax; 
+  # Exercise code that uses the mock objects. Google Mock will catch any violation to the expectations as soon as it arises. 
 
 =  Why Google Mock? =
 While mock objects help you remove unnecessary dependencies in tests and make them fast and reliable, using mocks manually in C++ is _hard_:
@@ -41,18 +41,16 @@ Google Mock was built to help C++ programmers. It was inspired by [http://www.jm
   * You need to make sure that your module interacts with other modules in the right way, but it's hard to observe the interaction; therefore you resort to observing the side effects at the end of the action, but it's awkward at best. 
   * You want to "mock out" your dependencies, except that they don't have mock implementations yet; and, frankly, you aren't thrilled by some of those hand-written mocks. 
 
-We encourage you to use Google Mock as
+We encourage you to use Google Mock as:
 
   * a _design_ tool, for it lets you experiment with your interface design early and often. More iterations lead to better designs! 
   * a _testing_ tool to cut your tests' outbound dependencies and probe the interaction between your module and its collaborators. 
-
-Google Mock currently works with [http://code.google.com/p/googletest/ Google C++ Testing Framework].  We hope to make it work with other testing frameworks as well in the future.
 
 =  Getting Started =
 Using Google Mock is easy! Inside your C++ source file, just #include `<gtest/gtest.h>` and `<gmock/gmock.h>`, and you are ready to go.
 
 =  A Case for Mock Turtles =
-Let's look at an example. Suppose you are developing a graphics program that relies on a LOGO-like API for drawing. How would you test that it does the right thing? Well, you can run it and compare the screen with a golden screen snapshot, but let's admit it: tests like this are expensive to run and fragile (What if you just upgraded to a shiny new graphics card that has better anti-aliasing? Suddenly you have to update all your golden images.). It would be too painful if all your tests are like this. Fortunately, you learned about Dependency Injection and know the right thing to do: instead of having your application talk to the system API directly, wrap the API in an interface (say, `Turtle`) and code to that interface:
+Let's look at an example. Suppose you are developing a graphics program that relies on a LOGO-like API for drawing. How would you test that it does the right thing? Well, you can run it and compare the screen with a golden screen snapshot, but let's admit it: tests like this are expensive to run and fragile (What if you just upgraded to a shiny new graphics card that has better anti-aliasing? Suddenly you have to update all your golden images.). It would be too painful if all your tests are like this. Fortunately, you learned about Dependency Injection and know the right thing to do: instead of having your application talk to the drawing API directly, wrap the API in an interface (say, `Turtle`) and code to that interface:
 
 {{{
 class Turtle {
@@ -81,7 +79,7 @@ If you are lucky, the mocks you need to use have already been implemented by som
 Using the `Turtle` interface as example, here are the simple steps you need to follow:
  
   # Derive a class `MockTurtle` from `Turtle`. 
-  # Take a virtual function of `Turtle`. Count how many arguments it has (you can count from 0 to 10, can't you?). 
+  # Take a virtual function of `Turtle`. Count how many arguments it has. 
   # Inside the child class, write `MOCK_METHODn();` (or `MOCK_CONST_METHODn();` if you are mocking a `const` method), where `n` is the number of the arguments; if you counted wrong, shame on you, and a compiler error will tell you so. 
   # Now comes the fun part: you take the function signature, cut-and-paste the _function name_ as the _first_ argument to the macro, and leave what's left as the _second_ argument (in case you're curious, this is the _type of the function_). 
   # Repeat until all virtual functions you want to mock are done. 
@@ -102,7 +100,7 @@ class MockTurtle : public Turtle {
 };
 }}}
 
-You don't need to define these mock methods somewhere else - the `MOCK_METHOD*` macros will generate the definitions for you. It's that simple! Once you get the hang of it, you can pump out mock classes faster than your source-control system can handle your check-ins (if you are _really_ keen on it).
+You don't need to define these mock methods somewhere else - the `MOCK_METHOD*` macros will generate the definitions for you. It's that simple! Once you get the hang of it, you can pump out mock classes faster than your source-control system can handle your check-ins.
 
 *Tip:* If even this is too much work for you, you'll find the
 `gmock_gen.py` tool in Google Mock's `scripts/generator/` directory (courtesy of the [http://code.google.com/p/cppclean/ cppclean] project) useful.  This command-line
@@ -162,7 +160,7 @@ Actually: never called;
 Expected: called at least once.
 }}}
 
-*Tip 1:* If you run the test from an Emacs buffer, you can hit `<Enter>` on the line number to jump right to the failed expectation.
+*Tip 1:* If you run the test from an Emacs buffer, you can hit `<Enter>` on the line number displayed in the error message to jump right to the failed expectation.
 
 *Tip 2:* If your mock objects are never deleted, the final verification won't happen. Therefore it's a good idea to use a heap leak checker in your tests when you allocate mocks on the heap.
 
