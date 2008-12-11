@@ -164,9 +164,9 @@ Expected: called at least once.
 
 *Tip 2:* If your mock objects are never deleted, the final verification won't happen. Therefore it's a good idea to use a heap leak checker in your tests when you allocate mocks on the heap.
 
-*Important note:* Google Mock requires expectations to be set *before* the mock functions are called, otherwise the behavior is *undefined*. In particular, you mustn't interleave `EXPECT_CALL()s` and calls to the mock functions.
+*Important note:* Google Mock requires expectations to be set *before* the mock functions are called, otherwise the behavior is *undefined*. In particular, you mustn't interleave {{{EXPECT_CALL()}}}s and calls to the mock functions.
 
-This means `EXPECT_CALL()` should be read as expecting that a call will occur _in the future_, not that a call has occurred. Why does Google Mock work like that? Well, specifying the expectation beforehand allows Google Mock to report a violation as soon as it rises, when the context (stack trace, etc) is still available. This makes debugging much easier.
+This means `EXPECT_CALL()` should be read as expecting that a call will occur _in the future_, not that a call has occurred. Why does Google Mock work like that? Well, specifying the expectation beforehand allows Google Mock to report a violation as soon as it arises, when the context (stack trace, etc) is still available. This makes debugging much easier.
 
 Admittedly, this test is contrived and doesn't do much. You can easily achieve the same effect without using Google Mock. However, as we shall reveal soon, Google Mock allows you to do _much more_ with the mocks.
 
@@ -200,17 +200,17 @@ EXPECT_CALL(turtle, GetX())
 
 says that the `turtle` object's `GetX()` method will be called five times, it will return 100 the first time, 150 the second time, and then 200 every time. Some people like to call this style of syntax a Domain-Specific Language (DSL).
 
-*Note:* Why do we use a macro to do this? Well it serves two purposes: first it makes expectations easily identifiable (either by `grep` or by a human reader), and second it allows Google Mock to include the source file location of a failed expectation in messages, making debugging easier.
+*Note:* Why do we use a macro to do this? It serves two purposes: first it makes expectations easily identifiable (either by `grep` or by a human reader), and second it allows Google Mock to include the source file location of a failed expectation in messages, making debugging easier.
 
 ==  Matchers: What Arguments Do We Expect? ==
-When a mock function takes arguments, we can specify what arguments we are expecting, e.g.
+When a mock function takes arguments, we can specify what arguments we are expecting; for example:
 
 {{{
 // Expects the turtle to move forward by 100 units.
 EXPECT_CALL(turtle, Forward(100));
 }}}
 
-Sometimes you may not want to be too specific (Remember that talk about tests being too rigid? Over specification leads to brittle tests and obscures the intent of tests. Therefore we encourage you to specify only what's necessary - no more, no less.). If you care to check that `Forward()` will be called but aren't interested in its actually argument, write `_` as the argument, which means "anything goes":
+Sometimes you may not want to be too specific (Remember that talk about tests being too rigid? Over specification leads to brittle tests and obscures the intent of tests. Therefore we encourage you to specify only what's necessary - no more, no less.). If you care to check that `Forward()` will be called but aren't interested in its actual argument, write `_` as the argument, which means "anything goes":
 
 {{{
 using testing::_;
@@ -221,14 +221,14 @@ EXPECT_CALL(turtle, Forward(_));
 
 `_` is an instance of what we call *matchers*. A matcher is like a predicate and can test whether an argument is what we'd expect. You can use a matcher inside `EXPECT_CALL()` wherever a function argument is expected.
 
-A list of built-in matchers can be found in the CheatSheet. For example, you can write
+A list of built-in matchers can be found in the CheatSheet. For example, here's the `Ge` (greater than or equal) matcher:
 
 {{{
 using testing::Ge;...
 EXPECT_CALL(turtle, Forward(Ge(100)));
 }}}
 
-for that the turtle will be told to go forward by at least 100 units. 
+This checks that the turtle will be told to go forward by at least 100 units. 
 
 ==  Cardinalities: How Many Times Will It Be Called? ==
 The first clause we can specify following an `EXPECT_CALL()` is `Times()`. We call its argument a *cardinality* as it tells _how many times_ the call should occur. It allows us to repeat an expectation many times without actually writing it as many times. More importantly, a cardinality can be "fuzzy", just like a matcher can be. This allows a user to express the intent of a test exactly.
@@ -260,7 +260,7 @@ EXPECT_CALL(turtle, GetX())
     .WillOnce(Return(300));
 }}}
 
-says that `turtle.GetX()` will be called _exactly three times_ (Google Mock inferred this from how many `WillOnce()` clauses we've written, since we didn't explicitly write `Times()`), and will return 100, 200, and 300 respectively.
+This says that `turtle.GetX()` will be called _exactly three times_ (Google Mock inferred this from how many `WillOnce()` clauses we've written, since we didn't explicitly write `Times()`), and will return 100, 200, and 300 respectively.
 
 {{{
 using testing::Return;...
@@ -270,11 +270,11 @@ EXPECT_CALL(turtle, GetY())
     .WillRepeatedly(Return(300));
 }}}
 
-says that `turtle.GetY()` will be called _at least twice_ (Google Mock knows this as we've written two `WillOnce()` clauses and a `WillRepeatedly()` while having no explicit `Times()`), will return 100 and 200 respectively the first two times, and 300 from the third time on.
+says that `turtle.GetY()` will be called _at least twice_ (Google Mock knows this as we've written two `WillOnce()` clauses and a `WillRepeatedly()` while having no explicit `Times()`), will return 100 the first time, 200 the second time, and 300 from the third time on.
 
 Of course, if you explicitly write a `Times()`, Google Mock will not try to infer the cardinality itself. What if the number you specified is larger than there are `WillOnce()` clauses? Well, after all `WillOnce()`s are used up, Google Mock will do the _default_ action for the function every time (unless, of course, you have a `WillRepeatedly()`.).
 
-What can we do inside `WillOnce()` besides `Return()`? You can return a reference using `ReturnRef(variable)`, or invoke a pre-defined function, among others.
+What can we do inside `WillOnce()` besides `Return()`? You can return a reference using `ReturnRef(variable)`, or invoke a pre-defined function, among [CheatSheet#Actions others].
 
 *Important note:* The `EXPECT_CALL()` statement evaluates the action clause only once, even though the action may be performed many times. Therefore you must be careful about side effects. The following may not do what you want:
 
