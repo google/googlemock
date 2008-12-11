@@ -21,7 +21,7 @@ reason for one to use Google Test.
 
 Since Google Mock is open-source, people are free to contribute to it.
 If you feel strongly about it, please consider reading the DevGuide
-and working on making Google Mock testing-framework-neutral. :-)
+and working on making Google Mock testing-framework-neutral.
 
 == How am I supposed to make sense of these horrible template errors? ==
 
@@ -89,7 +89,7 @@ The fact they are the same _is_ interesting information.
 Does the class (hopefully a pure interface) you are mocking have a
 virtual destructor?
 
-Whenever you derive from a base class, make sure it's destructor is
+Whenever you derive from a base class, make sure its destructor is
 virtual.  Otherwise Bad Things will happen.  Consider the following
 code:
 
@@ -135,7 +135,7 @@ EXPECT_CALL(foo, Bar())
     .RetiresOnSaturation();
 }}}
 
-The problem, is that they didn't pick the *best* way to express the test's
+The problem is that they didn't pick the *best* way to express the test's
 intent.
 
 By default, expectations don't have to be matched in _any_ particular
@@ -262,7 +262,7 @@ comma, but that's much rarer.
 Other advantages include:
   # `MOCK_METHOD1(Foo, int, bool)` can leave a reader wonder whether the method returns `int` or `bool`, while there won't be such confusion using Google Mock's syntax.
   # The way Google Mock describes a function type is nothing new, although many people may not be familiar with it.  The same syntax was used in C, and the `function` library in `tr1` uses this syntax extensively.  Since `tr1` will become a part of the new version of STL, we feel very comfortable to be consistent with it.
-  # The function type syntax is also used in other parts of Google Mock's API (e.g. the action interface)in order to make the implementation tractable. A user needs to learn it anyway in order to utilize Google Mock's more advanced features.  We'd as well stick to the same syntax in `MOCK_METHOD*`!
+  # The function type syntax is also used in other parts of Google Mock's API (e.g. the action interface) in order to make the implementation tractable. A user needs to learn it anyway in order to utilize Google Mock's more advanced features.  We'd as well stick to the same syntax in `MOCK_METHOD*`!
 
 == My code calls a static/global function.  Can I mock it? ==
 
@@ -308,7 +308,7 @@ problem. Or, you might be trying to solve the wrong problem. :-)
 
 == I got a warning "Uninteresting function call encountered - default action taken.."  Should I panic? ==
 
-By all means, NO!  It's just an FYI. :-)
+By all means, NO!  It's just an FYI.
 
 What it means is that you have a mock function, you haven't set any
 expectations on it (by Google Mock's rule this means that you are not
