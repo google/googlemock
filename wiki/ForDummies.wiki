@@ -21,7 +21,7 @@ Using Google Mock involves three basic steps:
  
   # Use some simple macros to describe the interface you want to mock, and they will expand to the implementation of your mock class; 
   # Create some mock objects and specify its expectations and behavior using an intuitive syntax; 
-  # Exercise code that uses the mock objects. Google Mock will catch any violation to the expectations as soon as it arises. 
+  # Exercise code that uses the mock objects. Google Mock will catch any violation of the expectations as soon as it arises. 
 
 =  Why Google Mock? =
 While mock objects help you remove unnecessary dependencies in tests and make them fast and reliable, using mocks manually in C++ is _hard_:
@@ -38,7 +38,7 @@ Google Mock was built to help C++ programmers. It was inspired by [http://www.jm
   * Your tests are slow as they depend on too many libraries or use expensive resources (e.g. a database). 
   * Your tests are brittle as some resources they use are unreliable (e.g. the network). 
   * You want to test how your code handles a failure (e.g. a file checksum error), but it's not easy to cause one. 
-  * You need to make sure that your module interacts with other modules in the right way, but it's hard to observe the interaction; therefore you resort to observing the side effects at the end of the action, but it's awkward at best. 
+  * You need to make sure that your module interacts with other modules in the right way, but it's hard to observe the interaction; therefore you resort to observing the side effects at the end of the action, which is awkward at best. 
   * You want to "mock out" your dependencies, except that they don't have mock implementations yet; and, frankly, you aren't thrilled by some of those hand-written mocks. 
 
 We encourage you to use Google Mock as:
@@ -299,7 +299,7 @@ EXPECT_CALL(turtle, GetY())
 Obviously `turtle.GetY()` is expected to be called four times. But if you think it will return 100 every time, think twice! Remember that one `WillOnce()` clause will be consumed each time the function is invoked and the default action will be taken afterwards. So the right answer is that `turtle.GetY()` will return 100 the first time, but *return 0 from the second time on*, as returning 0 is the default action for `int` functions.
 
 ==  Using Multiple Expectations ==
-So far we've only shown examples where you have a single expectation. More realistically, you're gonna specify expectations on multiple mock methods, which may be from multiple mock objects.
+So far we've only shown examples where you have a single expectation. More realistically, you're going to specify expectations on multiple mock methods, which may be from multiple mock objects.
 
 By default, when a mock method is invoked, Google Mock will search the expectations in the *reverse order* they are defined, and stop when an active expectation that matches the arguments is found (you can think of it as "newer rules override older ones."). If the matching expectation cannot take any more calls, you will get an upper-bound-violated failure. Here's an example:
 
@@ -409,4 +409,4 @@ In Google Mock, if you are not interested in a method, just don't say anything a
 =  What Now? =
 Congratulations! You've learned enough about Google Mock to start using it. Now, you might want to join the [http://groups.google.com/group/googlemock googlemock] discussion group and actually write some tests using Google Mock - it will be fun. Hey, it may even be addictive - you've been warned.
 
-Then, if you feel like increasing your mock quotient, you should move on to the CookBook. You can learn many advanced features of Google Mock there (yes, they do exist!).
+Then, if you feel like increasing your mock quotient, you should move on to the CookBook. You can learn many advanced features of Google Mock there -- and advance your level of enjoyment and testing bliss.
