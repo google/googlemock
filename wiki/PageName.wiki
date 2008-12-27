@@ -1,5 +1,5 @@
+#summary The design of new Google Mock features
 #labels Phase-Design
-#The design of new Google Mock features
 
 This page discusses the design of new Google Mock features.
 
