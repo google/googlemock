@@ -82,7 +82,6 @@ class MockStack : public StackInterface<Elem> {
 };
 }}}
 
-<a name="MockingNonVirtualMethods"/>
 ==  Mocking Non-virtual Methods ==
 
 Google Mock can mock non-virtual functions to be used in what we call _hi-perf
@@ -158,7 +157,8 @@ per-function syntactic overhead will be much lower.
 
 If you are concerned about the performance overhead incurred by
 virtual functions, and profiling confirms your concern, you can
-combine this with the recipe for [#MockingNonVirtualMethods mocking non-virtual methods].
+combine this with the recipe for <a
+href="#Mocking_Non-Virtual_Methods">mocking non-virtual methods</a>.
 
 ==  Nice Mocks and Strict Mocks ==
 
