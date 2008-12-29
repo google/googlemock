@@ -293,6 +293,9 @@ unary predicate (as used in various algorithms in STL) using
 ||`InvokeWithoutArgs(object_pointer, &class::method)`||Invoke the method on the object, which takes no arguments.||
 ||`InvokeArgument<N>(arg1, arg2, ..., argk)`||Invoke the mock function's `N`-th (0-based) argument, which must be a function or a functor, with the `k` arguments.||
 
+The return value of the invoked function is used as the return value
+of the action.
+
 When defining a function or functor to be used with `Invoke*()`, you can declare any unused parameters as `Unused`:
 {{{
   double Distance(Unused, double x, double y) { return sqrt(x*x + y*y); }
