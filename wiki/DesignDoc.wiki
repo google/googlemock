@@ -9,8 +9,8 @@ This page discusses the design of new Google Mock features.
 
 == Problem ==
 
-In Google Mock, defining custom actions requires some non-trivial
-effort (thanks to the lack of lambda expressions in C++).  For
+Due to the lack of closures in C++, it currently requires some
+non-trivial effort to define a custom action in Google Mock.  For
 example, suppose you want to "increment the value pointed to by the
 second argument of the mock function and return it", you could write:
 
@@ -47,16 +47,20 @@ PolymorphicAction<IncrementArg1Action> IncrementArg1() {
 ... WillOnce(IncrementArg1());
 }}}
 
+Our goal is to allow defining custom actions with the least amount of
+boiler-plate C++ requires.
+
 == Solution ==
 
-We propose to introduce a new macro to make this much simpler.  Using
-the syntax:
+We propose to introduce a new macro:
 {{{
 ACTION(name) { statements; }
 }}}
-in a namespace scope will define an action with the given name that
-executes the statements.  Inside the statements, you can refer to the
-K-th (0-based) argument of the mock function as `argK`.  For example:
+
+Using this in a namespace scope will define an action with the given
+name that executes the statements.  Inside the statements, you can
+refer to the K-th (0-based) argument of the mock function as `argK`.
+For example:
 {{{
 ACTION(IncrementArg1) { return ++(*arg1); }
 }}}
@@ -67,9 +71,9 @@ allows you to write
 
 Note that you don't need to specify the types of the mock function
 arguments, as brevity is a top design goal here.  Rest assured that
-your code is still type-safe: you'll get a compiler error if `*arg1`
-doesn't support the `++` operator, or if the type of `++(*arg1)` isn't
-compatible with the mock function's return type.
+your code is still type-safe though: you'll get a compiler error if
+`*arg1` doesn't support the `++` operator, or if the type of
+`++(*arg1)` isn't compatible with the mock function's return type.
 
 Another example:
 {{{
@@ -87,26 +91,26 @@ with 5, calls function `Blah()`, sets the value pointed to by argument
 For more convenience and flexibility, you can also use the following
 pre-defined symbols in the body of `ACTION`:
 
-|| `argK_Type` || The type of the K-th (0-based) argument of the mock function ||
+|| `argK_type` || The type of the K-th (0-based) argument of the mock function ||
 || `args` || All arguments of the mock function as a tuple ||
-|| `args_Type` || The type of all arguments as a tuple ||
-|| `return_Type` || The return type of the mock function ||
-|| `function_Type` || The type of the mock function ||
+|| `args_type` || The type of all arguments of the mock function as a tuple ||
+|| `return_type` || The return type of the mock function ||
+|| `function_type` || The type of the mock function ||
 
-For example, given a mock function whose signature is:
+For example, when using an `ACTION` as a stub action for mock function:
 {{{
 int DoSomething(bool flag, int* ptr);
 }}}
-and an `ACTION` definition to be used as a stub action for this mock
-function, inside the `ACTION` body we have:
-  * `arg0` refers to `flag`;
-  * `arg0_Type` is `bool`;
-  * `arg1` refers to `ptr`;
-  * `arg1_Type` is `int*`;
-  * `args` refers to the tuple `(flag, ptr)`;
-  * `args_Type` is `std::tr1::tuple<bool, int*>`;
-  * `return_Type` is `int`; and
-  * `function_Type` is `int(bool, int*)`.
+we have:
+|| *Pre-defined Symbol* || *Is Bound To* ||
+|| `arg0` || the value of `flag` ||
+|| `arg0_type` || the type `bool` ||
+|| `arg1` || the value of `ptr` ||
+|| `arg1_type` || the type `int*` ||
+|| `args` || the tuple `(flag, ptr)` ||
+|| `args_type` || the type `std::tr1::tuple<bool, int*>` ||
+|| `return_type` || the type `int` ||
+|| `function_type` || the type `int(bool, int*)` ||
 
 == Parameterized actions ==
 
@@ -131,8 +135,9 @@ invoke the mock function, and the term _parameters_ for the values
 used to instantiate an action.
 
 Note that you don't need to provide the type of the parameter either.
-Suppose the parameter is named `param`, you can also use `param_Type`
-to refer to the type of the parameter as inferred by the compiler.
+Suppose the parameter is named `param`, you can also use the
+Google-Mock-defined symbol `param_type` to refer to the type of the
+parameter as inferred by the compiler.
 
 We will also provide `ACTION_P2`, `ACTION_P3`, and etc to support
 multi-parameter actions.  For example,
@@ -148,8 +153,8 @@ lets you write
 ... WillOnce(ReturnDistanceTo(5.0, 26.5));
 }}}
 
-You can view `ACTION` as a short-hand for `ACTION_P0`, and `ACTION_P` as a
-short-hand for `ACTION_P1`.
+You can view `ACTION` as a degenerated parameterized action where the
+number of parameters is 0.
 
 == Advanced Usage ==
 
@@ -157,15 +162,32 @@ short-hand for `ACTION_P1`.
 
 For maximum brevity and reusability, the `ACTION*` macros don't let
 you specify the types of the mock function arguments and the action
-parameters.  Instead, we use the types inferred by the compiler.
+parameters.  Instead, we let the compiler infer the types for us.
 
 Sometimes, however, we may want to be more explicit about the types.
-TODO: finish this.
+There are several tricks to do that.  For example:
+{{{
+ACTION(Foo) {
+  // Makes sure arg0 can be converted to int.
+  int n = arg0;
+  ... use n instead of arg0 here ...
+}
+
+ACTION_P(Bar, param) {
+  // Makes sure the type of arg1 is const char*.
+  testing::AssertTypeEq<const char*, arg1_type>();
+
+  // Makes sure param can be converted to bool.
+  bool flag = param;
+}
+}}}
+where `AssertTypeEq` is a compile-time assertion we plan to add to
+Google Test.
 
 == When to Use ==
 
 While the new macros are very convenient, please also consider other
-means for implementing actions (e.g. via `ActionInterface` or
+means of implementing actions (e.g. via `ActionInterface` or
 `MakePolymorphicAction()`), especially if you need to use the defined
 action a lot.  While the other approaches require more work, they give
 you more control on the types of the mock function arguments and the
@@ -179,8 +201,9 @@ parameters.
 The reason we don't allow `ACTION*()` inside a function body is that
 the current C++ standard doesn't allow function-local types to be used
 to instantiate templates.  The upcoming C++0x standard will lift this
-restriction.  Once this is widely supported by compilers, we can
-revisit this and add support for using `ACTION*()` inside a function.
+restriction.  Once this feature is widely supported by compilers, we
+can revisit the implementation and add support for using `ACTION*()`
+inside a function.
 
 = Macros for Defining Matchers =
 
@@ -201,4 +224,5 @@ MATCHER(IsPositive) { return arg > 0; }
 you can use `IsPositive()` as a matcher that matches a value iff it is
 greater than 0.
 
-We will have `MATCHER_P`, `MATCHER_P2`, and etc as well.
+We will also add `MATCHER_P`, `MATCHER_P2`, and etc for parameterized
+matchers.
