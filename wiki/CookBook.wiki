@@ -488,6 +488,71 @@ of times, etc), and a real object will answer the calls (so the
 behavior will be the same as in production). This gives you the best
 of both worlds.
 
+==  Delegating Calls to a Parent Class  ==
+
+Ideally, you should code to interfaces, whose methods are all pure
+virtual. In reality, sometimes you do need to mock a virtual method
+that is not pure (i.e, it already has an implementation). For example:
+
+{{{
+class Foo {
+ public:
+  virtual ~Foo();
+
+  virtual void Pure(int n) = 0;
+  virtual int Concrete(const char* str) { ... }
+};
+
+class MockFoo : public Foo {
+ public:
+  // Mocking a pure method.
+  MOCK_METHOD1(Pure, void(int n));
+  // Mocking a concrete method.  Foo::Concrete() is shadowed.
+  MOCK_METHOD1(Concrete, int(const char* str));
+};
+}}}
+
+Sometimes you may want to call `Foo::Concrete()` instead of
+`MockFoo::Concrete()`. Perhaps you want to do it as part of a stub
+action, or perhaps your test doesn't need to mock `Concrete()` at all
+(but it would be oh-so painful to have to define a new mock class
+whenever you don't need to mock one of its methods).
+
+The trick is to leave a back door in your mock class for accessing the
+real methods in the base class:
+
+{{{
+class MockFoo : public Foo {
+ public:
+  // Mocking a pure method.
+  MOCK_METHOD1(Pure, void(int n));
+  // Mocking a concrete method.  Foo::Concrete() is shadowed.
+  MOCK_METHOD1(Concrete, int(const char* str));
+
+  // Use this to call Concrete() defined in Foo.
+  int FooConcrete(const char* str) { return Foo::Concrete(str); }
+};
+}}}
+
+Now, you can call `Foo::Concrete()` inside an action by:
+
+{{{
+  EXPECT_CALL(foo, Concrete(_))
+      .WillOnce(Invoke(&foo, &MockFoo::FooConcrete));
+}}}
+
+or tell the mock object that you don't want to mock `Concrete()`:
+
+{{{
+  ON_CALL(foo, Concrete(_))
+      .WillByDefault(Invoke(&foo, &MockFoo::FooConcrete));
+}}}
+
+(Why don't we just write `Invoke(&foo, &Foo::Concrete)`? If you do
+that, `MockFoo::Concrete()` will be called (and cause an infinite
+recursion) since `Foo::Concrete()` is virtual. That's just how C++
+works.)
+
 =  Using Matchers =
 
 ==  Matching Argument Values Exactly ==
@@ -1747,71 +1812,6 @@ versus
 }}}
 
 =  Misc Recipes on Using Google Mock =
-
-==  Invoking the Real Implementation of a Mocked Function ==
-
-Ideally, you should code to interfaces, whose methods are all pure
-virtual. In reality, sometimes you do need to mock a virtual method
-that is not pure (i.e, it already has an implementation). For example:
-
-{{{
-class Foo {
- public:
-  virtual ~Foo();
-
-  virtual void Pure(int n) = 0;
-  virtual int Concrete(const char* str) { ... }
-};
-
-class MockFoo : public Foo {
- public:
-  // Mocking a pure method.
-  MOCK_METHOD1(Pure, void(int n));
-  // Mocking a concrete method.  Foo::Concrete() is shadowed.
-  MOCK_METHOD1(Concrete, int(const char* str));
-};
-}}}
-
-Sometimes you may want to call `Foo::Concrete()` instead of
-`MockFoo::Concrete()`. Perhaps you want to do it as part of a stub
-action, or perhaps your test doesn't need to mock `Concrete()` at all
-(but it would be oh-so painful to have to define a new mock class
-whenever you don't need to mock one of its methods).
-
-The trick is to leave a back door in your mock class for accessing the
-real methods in the base class:
-
-{{{
-class MockFoo : public Foo {
- public:
-  // Mocking a pure method.
-  MOCK_METHOD1(Pure, void(int n));
-  // Mocking a concrete method.  Foo::Concrete() is shadowed.
-  MOCK_METHOD1(Concrete, int(const char* str));
-
-  // Use this to call Concrete() defined in Foo.
-  int FooConcrete(const char* str) { return Foo::Concrete(str); }
-};
-}}}
-
-Now, you can call `Foo::Concrete()` inside an action by:
-
-{{{
-  EXPECT_CALL(foo, Concrete(_))
-      .WillOnce(Invoke(&foo, &MockFoo::FooConcrete));
-}}}
-
-or tell the mock object that you don't want to mock `Concrete()`:
-
-{{{
-  ON_CALL(foo, Concrete(_))
-      .WillByDefault(Invoke(&foo, &MockFoo::FooConcrete));
-}}}
-
-(Why don't we just write `Invoke(&foo, &Foo::Concrete)`? If you do
-that, `MockFoo::Concrete()` will be called (and cause an infinite
-recursion) since `Foo::Concrete()` is virtual. That's just how C++
-works.)
 
 ==  Forcing a Verification ==
 
