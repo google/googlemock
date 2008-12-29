@@ -157,7 +157,7 @@ per-function syntactic overhead will be much lower.
 
 If you are concerned about the performance overhead incurred by
 virtual functions, and profiling confirms your concern, you can
-combine this with the recipe for [#Mocking_Non_virtual_Methods mocking non-virtual methods].
+combine this with the recipe for [#Mocking_Non-virtual_Methods mocking non-virtual methods].
 
 ==  Nice Mocks and Strict Mocks ==
 
