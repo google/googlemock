@@ -175,14 +175,14 @@ ACTION(Foo) {
 
 ACTION_P(Bar, param) {
   // Makes sure the type of arg1 is const char*.
-  testing::AssertTypeEq<const char*, arg1_type>();
+  testing::StaticAssertTypeEq<const char*, arg1_type>();
 
   // Makes sure param can be converted to bool.
   bool flag = param;
 }
 }}}
-where `AssertTypeEq` is a compile-time assertion we plan to add to
-Google Test.
+where `StaticAssertTypeEq` is a compile-time assertion we plan to add to
+Google Test (the name is chosen to match `static_assert` in C++0x).
 
 == When to Use ==
 
