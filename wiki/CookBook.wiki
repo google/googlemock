@@ -122,6 +122,43 @@ real class. That's fine as long as the test doesn't need to call it.
 This technique can only be used in *template* code, as shown in the above
 example.
 
+== Mocking Free Functions ==
+
+It's possible to use Google Mock to mock a free function (i.e. a
+C-style function or a static method).  You just need to rewrite your
+code to use an interface (abstract class).
+
+Instead of calling a free function (say, `OpenFile`) directly,
+introduce an interface for it and have a concrete subclass that calls
+the free function:
+
+{{{
+class FileInterface {
+ public:
+  ...
+  virtual bool Open(const char* path, const char* mode) = 0;
+};
+
+class File : public FileInterface {
+ public:
+  ...
+  virtual bool Open(const char* path, const char* mode) {
+    return OpenFile(path, mode);
+  }
+};
+}}}
+
+Your code should talk to `FileInterface` to open a file.  Now it's
+easy to mock out the function.
+
+This may seem much hassle, but in practice you often have multiple
+related functions that you can put in the same interface, so the
+per-function syntactic overhead will be much lower.
+
+If you are concerned about the performance overhead incurred by
+virtual functions, and profiling confirms your concern, you can
+combine this with the recipe for [#Mocking_Non_virtual_Methods mocking non-virtual methods].
+
 ==  Nice Mocks and Strict Mocks ==
 
 If a mock method has no `EXPECT_CALL` spec but is called, Google Mock
