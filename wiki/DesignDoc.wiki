@@ -200,13 +200,6 @@ Note that we have to pick different suffixes (`Action`, `ActionP`,
 or the action definitions cannot be overloaded on the number of
 parameters.
 
-=== Composing ACTION Definitions ===
-
-This is for invoking another `ACTION` inside the definition of an
-`ACTION*`.  The feature is TBD -- I'm not sure we want it yet, as one
-can get a similar effect by putting `ACTION` definitions in function
-templates and composing the function templates.
-
 == When to Use ==
 
 While the new macros are very convenient, please also consider other
@@ -219,7 +212,32 @@ messages that pay off in the long run.  They also allow overloading
 actions based on parameter types, as opposed to just the number of
 parameters.
 
+== Related Work ==
+
+As you may have realized, the `ACTION*` macros resemble closures (also
+known as lambda expressions or anonymous functions).  Indeed, both of
+them seek to lower the syntactic overhead for defining a function.
+
+C++0x will support lambdas, but they are not part of C++ right now.
+Some non-standard libraries (most notably BLL or Boost Lambda Library)
+try to alleviate this problem.  However, they are not a good choice
+for defining actions as:
+
+  * They are non-standard and not widely installed.  Google Mock only depends on standard libraries and `tr1::tuple`, which is part of the new C++ standard and comes with gcc 4+.  We want to keep it that way.
+  * They are not trivial to learn.
+  * They will become obsolete when C++0x's lambda feature is widely supported.  We don't want to make our users use a dying library.
+  * Since they are based on operators, they are rather ad hoc: you cannot use statements, and you cannot pass the lambda arguments to a function, for example.
+  * They have subtle semantics that easily confuses new users.  For example, in expression `_1++ + foo++`, `foo` will be incremented only once where the expression is evaluated, while `_1` will be incremented every time the unnamed function is invoked.  This is far from intuitive.
+
+`ACTION*` avoid all these problems.
+
 == Future Improvements ==
+
+There may be a need for composing `ACTION*` definitions (i.e. invoking
+another `ACTION` inside the definition of one `ACTION*`).  We are not
+sure we want it yet, as one can get a similar effect by putting
+`ACTION` definitions in function templates and composing the function
+templates.  We'll revisit this based on user feedback.
 
 The reason we don't allow `ACTION*()` inside a function body is that
 the current C++ standard doesn't allow function-local types to be used
@@ -227,6 +245,9 @@ to instantiate templates.  The upcoming C++0x standard will lift this
 restriction.  Once this feature is widely supported by compilers, we
 can revisit the implementation and add support for using `ACTION*()`
 inside a function.
+
+C++0x will also support lambda expressions.  When they become
+available, we may want to support using lambdas as actions.
 
 = Macros for Defining Matchers =
 
