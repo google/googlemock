@@ -158,6 +158,14 @@ number of parameters is 0.
 
 == Advanced Usages ==
 
+=== Overloading Actions ===
+
+You can easily define actions overloaded on the number of parameters:
+{{{
+ACTION_P(Plus, a) { ... }
+ACTION_P2(Plus, a, b) { ... }
+}}}
+
 === Restricting the Type of an Argument or Parameter ===
 
 For maximum brevity and reusability, the `ACTION*` macros don't let
