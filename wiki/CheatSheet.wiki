@@ -331,6 +331,8 @@ calls the mock function's #2 argument, passing to it `5` and `string("Hi")` by v
 
 The `ACTION*` macros cannot be used inside a function or class.
 
+Available since version 1.1.0.
+
 = Cardinalities =
 
 These are used in `Times()` to specify how many times a mock function will be called:
