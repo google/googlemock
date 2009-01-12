@@ -323,6 +323,14 @@ calls the mock function's #2 argument, passing to it `5` and `string("Hi")` by v
 ||`WithArgs<N1, N2, ..., Nk>(a)`||Pass the selected (0-based) arguments of the mock function to action `a` and perform it.||
 ||`WithoutArgs(a)`||Perform action `a` without any arguments.||
 
+== Defining Actions ==
+
+|| `ACTION(Sum) { return arg0 + arg1; }` || Defines an action `Sum()` to return the sum of the mock function's argument #0 and #1. ||
+|| `ACTION_P(Plus, n) { return arg0 + n; }` || Defines an action `Plus(n)` to return the sum of the mock function's argument #0 and `n`. ||
+|| `ACTION_Pk(Foo, p1, ..., pk) { statements; }` || Defines a parameterized action `Foo(p1, ..., pk)` to execute the given `statements`. ||
+
+The `ACTION*` macros cannot be used inside a function or class.
+
 = Cardinalities =
 
 These are used in `Times()` to specify how many times a mock function will be called:
