@@ -210,11 +210,12 @@ strings as well.
 
 Most STL-style containers support `==`, so you can use
 `Eq(expected_container)` or simply `expected_container` to match a
-container exactly. If you want to write the elements in-line, or match
-them more flexibly, you can use:
+container exactly.   If you want to write the elements in-line,
+match them more flexibly, or get more informative messages, you can use:
 
 ||`ElementsAre(e0, e1, ..., en)`||`argument` has `n + 1` elements, where the i-th element matches `ei`, which can be a value or a matcher. 0 to 10 arguments are allowed.||
 ||`ElementsAreArray(array)` or `ElementsAreArray(array, count)`||The same as `ElementsAre()` except that the expected element values/matchers come from a C-style array.||
+|| `ContainerEq(container)` || The same as `Eq(container)` except that the failure message also includes which elements are in one container but not the other. ||
 
 == Member Matchers ==
 
