@@ -2092,7 +2092,183 @@ back and forth between errors.
 
 =  Extending Google Mock =
 
-==  Writing New Matchers ==
+== Writing New Matchers Quickly ==
+
+The `MATCHER*` family of macros can be used to define custom matchers
+easily.  The syntax:
+
+{{{
+MATCHER(name, "description string") { statements; }
+}}}
+
+will define a matcher with the given name that executes the
+statements, which must return a `bool` to indicate if the match
+succeeds.  Inside the statements, you can refer to the value being
+matched by `arg`, and refer to its type by `arg_type`.
+
+The description string documents what the matcher does, and is used to
+generate the failure message when the match fails.  Since a
+`MATCHER()` is usually defined in a header file shared by multiple C++
+source files, we require the description to be a C-string _literal_ to
+avoid possible side effects.  It can be empty (`""`), in which case
+Google Mock will use the sequence of words in the matcher name as the
+description.
+
+For example:
+{{{
+MATCHER(IsEven, "") { return (arg % 2) == 0; }
+}}}
+allows you to write
+{{{
+  // Expects mock_foo.Bar(n) to be called where n is even.
+  EXPECT_CALL(mock_foo, Bar(IsEven()));
+}}}
+or,
+{{{
+  // Verifies that the value of some_expression is even.
+  EXPECT_THAT(some_expression, IsEven());
+}}}
+If the above assertion fails, it will print something like:
+{{{
+  Value of: some_expression
+  Expected: is even
+    Actual: 7
+}}}
+where the description `"is even"` is automatically calculated from the
+matcher name `IsEven`.
+
+Note that the type of the value being matched (`arg_type`) is
+determined by the context in which you use the matcher and is
+supplied to you by the compiler, so you don't need to worry about
+declaring it (nor can you).  This allows the matcher to be
+polymorphic.  For example, `IsEven()` can be used to match any type
+where the value of `(arg % 2) == 0` can be implicitly converted to
+a `bool`.  In the `Bar(IsEven())` example above, if method `Bar()`
+takes an `int`, `arg_type` will be `int`; if it takes an `unsigned long`,
+`arg_type` will be `unsigned long`; and so on.
+
+== Writing New Parameterized Matchers Quickly ==
+
+Sometimes you'll want to define a matcher that has parameters.  For that you
+can use the macro:
+{{{
+MATCHER_P(name, param_name, "description string") { statements; }
+}}}
+
+For example:
+{{{
+MATCHER_P(HasAbsoluteValue, value, "") { return abs(arg) == value; }
+}}}
+will allow you to write:
+{{{
+  EXPECT_THAT(Blah("a"), HasAbsoluteValue(n));
+}}}
+which may lead to this message (assuming `n` is 10):
+{{{
+  Value of: Blah("a")
+  Expected: has absolute value 10
+    Actual: -9
+}}}
+
+Note that both the matcher description and its parameter are
+printed, making the message human-friendly.
+
+In the matcher definition body, you can write `foo_type` to
+reference the type of a parameter named `foo`.  For example, in the
+body of `MATCHER_P(HasAbsoluteValue, value)` above, you can write
+`value_type` to refer to the type of `value`.
+
+Google Mock also provides `MATCHER_P2`, `MATCHER_P3`, ..., up to
+`MATCHER_P10` to support multi-parameter matchers:
+{{{
+MATCHER_Pk(name, param_1, ..., param_k, "description string") { statements; }
+}}}
+
+When defining a parameterized matcher, you can use Python-style
+interpolations in the description string to refer to the parameter
+values.  We support the following syntax currently:
+
+|| `%%` || a single `%` character ||
+|| `%(*)s` || all parameters of the matcher printed as a tuple ||
+|| `%(foo)s` || value of the matcher parameter named `foo` ||
+
+For example,
+{{{
+  MATCHER_P2(InClosedRange, low, hi, "is in range [%(low)s, %(hi)s]") {
+    return low <= arg && arg <= hi;
+  }
+  ...
+  EXPECT_THAT(3, InClosedRange(4, 6));
+}}}
+would generate a failure that contains the message:
+{{{
+  Expected: is in range [4, 6]
+}}}
+
+If you specify `""` as the description, the failure message will
+contain the sequence of words in the matcher name followed by the
+parameter values printed as a tuple.  For example,
+{{{
+  MATCHER_P2(InClosedRange, low, hi, "") { ... }
+  ...
+  EXPECT_THAT(3, InClosedRange(4, 6));
+}}}
+would generate a failure that contains the text:
+{{{
+  Expected: in closed range (4, 6)
+}}}
+
+For the purpose of typing, you can view
+{{{
+MATCHER_Pk(Foo, p1, ..., pk, "description string") { ... }
+}}}
+as shorthand for
+{{{
+template <typename p1_type, ..., typename pk_type>
+FooMatcherPk<p1_type, ..., pk_type>
+Foo(p1_type p1, ..., pk_type pk) { ... }
+}}}
+
+When you write `Foo(v1, ..., vk)`, the compiler infers the types of
+the parameters `v1`, ..., and `vk` for you.  If you are not happy with
+the result of the type inference, you can specify the types by
+explicitly instantiating the template, as in `Foo<long, bool>(5, false)`.
+As said earlier, you don't get to (or need to) specify
+`arg_type` as that's determined by the context in which the matcher
+is used.
+
+You can assign the result of expression `Foo(p1, ..., pk)` to a
+variable of type `FooMatcherPk<p1_type, ..., pk_type>`.  This can be
+useful when composing matchers.  Matchers that don't have a parameter
+or have only one parameter have special types: you can assign `Foo()`
+to a `FooMatcher`-typed variable, and assign `Foo(p)` to a
+`FooMatcherP<p_type>`-typed variable.
+
+While you can instantiate a matcher template with reference types,
+passing the parameters by pointer usually makes your code more
+readable.  If, however, you still want to pass a parameter by
+reference, be aware that in the failure message generated by the
+matcher you will see the value of the referenced object but not its
+address.
+
+You can overload matchers with different numbers of parameters:
+{{{
+MATCHER_P(Blah, a, "description string 1") { ... }
+MATCHER_P2(Blah, a, b, "description string 2") { ... }
+}}}
+
+While it's tempting to always use the `MATCHER*` macros when defining
+a new matcher, you should also consider implementing
+`MatcherInterface` or using `MakePolymorphicMatcher()` instead (see
+the recipes that follow), especially if you need to use the matcher a
+lot.  While these approaches require more work, they give you more
+control on the types of the value being matched and the matcher
+parameters, which in general leads to better compiler error messages
+that pay off in the long run.  They also allow overloading matchers
+based on parameter types (as opposed to just based on the number of
+parameters).
+
+==  Writing New Monomorphic Matchers ==
 
 A matcher of argument type `T` implements
 `testing::MatcherInterface<T>` and does two things: it tests whether a
