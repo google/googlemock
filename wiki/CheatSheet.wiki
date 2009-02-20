@@ -257,6 +257,14 @@ You can make a matcher from one or more other matchers:
 
 ||`MatcherCast<T>(m)`||casts matcher `m` to type `Matcher<T>`.||
 
+== Defining Matchers ==
+
+|| `MATCHER(IsEven, "") { return (arg % 2) == 0; }` || Defines a matcher `IsEven()` to match an even number. ||
+|| `MATCHER_P(IsDivisibleBy, n, "") { return (arg % n) == 0; }` || Defines a macher `IsDivisibleBy(n)` to match a number divisible by `n`. ||
+|| `MATCHER_P(Between, a, b, "is between %(a)s and %(b)s") { return a <= arg && arg <= b; }` || Defines a matcher `Between(a, b)` to match a value in the range [`a`, `b`]. ||
+
+The `MATCHER*` macros cannot be used inside a function or class.
+
 == Matchers as Predicates ==
 
 As a nice gesture, Google Mock lets you turn a matcher `m` into a
@@ -334,8 +342,6 @@ calls the mock function's #2 argument, passing to it `5` and `string("Hi")` by v
 || `ACTION_Pk(Foo, p1, ..., pk) { statements; }` || Defines a parameterized action `Foo(p1, ..., pk)` to execute the given `statements`. ||
 
 The `ACTION*` macros cannot be used inside a function or class.
-
-Available since version 1.1.0.
 
 = Cardinalities =
 
