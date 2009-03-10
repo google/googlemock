@@ -203,7 +203,7 @@ says that the `turtle` object's `GetX()` method will be called five times, it wi
 *Note:* Why do we use a macro to do this? It serves two purposes: first it makes expectations easily identifiable (either by `grep` or by a human reader), and second it allows Google Mock to include the source file location of a failed expectation in messages, making debugging easier.
 
 ==  Matchers: What Arguments Do We Expect? ==
-When a mock function takes arguments, we can specify what arguments we are expecting; for example:
+When a mock function takes arguments, we must specify what arguments we are expecting; for example:
 
 {{{
 // Expects the turtle to move forward by 100 units.
