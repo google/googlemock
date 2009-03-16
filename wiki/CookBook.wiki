@@ -2184,9 +2184,12 @@ Google Mock also provides `MATCHER_P2`, `MATCHER_P3`, ..., up to
 MATCHER_Pk(name, param_1, ..., param_k, "description string") { statements; }
 }}}
 
-When defining a parameterized matcher, you can use Python-style
-interpolations in the description string to refer to the parameter
-values.  We support the following syntax currently:
+Please note that the custom description string is for a particular
+*instance* of the matcher, where the parameters have been bound to
+actual values.  Therefore usually you'll want the parameter values to
+be part of the description.  Google Mock lets you do that using
+Python-style interpolations.  The following syntaxes are supported
+currently:
 
 || `%%` || a single `%` character ||
 || `%(*)s` || all parameters of the matcher printed as a tuple ||
