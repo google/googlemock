@@ -151,6 +151,18 @@ int main(int argc, char** argv) {
 }
 }}}
 
+If you want to use something other than Google Test (e.g. [http://apps.sourceforge.net/mediawiki/cppunit/index.php?title=Main_Page CppUnit] or
+[http://cxxtest.tigris.org/ CxxTest]) as your testing framework, just change the `main()` function to:
+{{{
+int main(int argc, char** argv) {
+  // The following line causes Google Mock to throw an exception on failure,
+  // which will be interpreted by your testing framework as a test failure.
+  testing::GTEST_FLAG(throw_on_failure) = true;
+  testing::InitGoogleMock(&argc, argv);
+  ... whatever your testing framework requires ...
+}
+}}}
+
 As you might have guessed, this test checks that `PenDown()` is called at least once. If the `painter` object didn't call this method, your test will fail with a message like this:
 
 {{{
