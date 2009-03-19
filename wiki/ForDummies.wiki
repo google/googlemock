@@ -151,18 +151,6 @@ int main(int argc, char** argv) {
 }
 }}}
 
-If you want to use something other than Google Test (e.g. [http://apps.sourceforge.net/mediawiki/cppunit/index.php?title=Main_Page CppUnit] or
-[http://cxxtest.tigris.org/ CxxTest]) as your testing framework, just change the `main()` function to:
-{{{
-int main(int argc, char** argv) {
-  // The following line causes Google Mock to throw an exception on failure,
-  // which will be interpreted by your testing framework as a test failure.
-  testing::GTEST_FLAG(throw_on_failure) = true;
-  testing::InitGoogleMock(&argc, argv);
-  ... whatever your testing framework requires ...
-}
-}}}
-
 As you might have guessed, this test checks that `PenDown()` is called at least once. If the `painter` object didn't call this method, your test will fail with a message like this:
 
 {{{
@@ -181,6 +169,19 @@ Expected: called at least once.
 This means `EXPECT_CALL()` should be read as expecting that a call will occur _in the future_, not that a call has occurred. Why does Google Mock work like that? Well, specifying the expectation beforehand allows Google Mock to report a violation as soon as it arises, when the context (stack trace, etc) is still available. This makes debugging much easier.
 
 Admittedly, this test is contrived and doesn't do much. You can easily achieve the same effect without using Google Mock. However, as we shall reveal soon, Google Mock allows you to do _much more_ with the mocks.
+
+== Using Google Mock with Any Testing Framework ==
+If you want to use something other than Google Test (e.g. [http://apps.sourceforge.net/mediawiki/cppunit/index.php?title=Main_Page CppUnit] or
+[http://cxxtest.tigris.org/ CxxTest]) as your testing framework, just change the `main()` function in the previous section to:
+{{{
+int main(int argc, char** argv) {
+  // The following line causes Google Mock to throw an exception on failure,
+  // which will be interpreted by your testing framework as a test failure.
+  testing::GTEST_FLAG(throw_on_failure) = true;
+  testing::InitGoogleMock(&argc, argv);
+  ... whatever your testing framework requires ...
+}
+}}}
 
 =  Setting Expectations =
 The key to using a mock object successfully is to set the _right expectations_ on it. If you set the expectations too strict, your test will fail as the result of unrelated changes. If you set them too loose, bugs can slip through. You want to do it just right such that your test can catch exactly the kind of bugs you intend it to catch. Google Mock provides the necessary means for you to do it "just right."
