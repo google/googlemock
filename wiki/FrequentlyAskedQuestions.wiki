@@ -348,3 +348,7 @@ side effect is, but doesn't say what the return value should be.  You
 need `DoAll()` to chain a `SetArgumentPointee()` with a `Return()`.
 
 See this [CookBook#Mocking_Side_Effects recipe] for more details and an example.
+
+
+== My question is not in your FAQ! ==
+Ask it on our mailing list! Just mail [googlemock@googlegroups.com] and someone will answer it. You might also want to search the mailing list [http://groups.google.com/group/googlemock/topics archives] but by all means let us know if you believe your question should belong to this FAQ.
