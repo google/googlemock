@@ -2090,6 +2090,27 @@ To make it even easier, you can add the following lines to your
 Then you can type `M-m` to start a build, or `M-up`/`M-down` to move
 back and forth between errors.
 
+== Fusing Google Mock Source Files =
+
+Google Mock's implementation consists of dozens of files (excluding
+its own tests).  Sometimes you may want them to be packaged up in
+fewer files instead, such that you can easily copy them to a new
+machine and start hacking there.  For this we provide an experimental
+Python script `fuse_gmock_files.py` in the `scripts/` directory
+(starting with release 1.2.0).  Assuming you have Python 2.4 or above
+installed on your machine, just go to that directory and run
+{{{
+python fuse_gmock_files.py OUTPUT_DIR
+}}}
+
+and you should see an `OUTPUT_DIR` directory being created with files
+`gtest/gtest.h`, `gmock/gmock.h`, and `gmock-gtest-all.cc` in it.
+These three files contain everything you need to use Google Mock (and
+Google Test).  Just copy them to anywhere you want and you are ready
+to write tests and use mocks.  You can use the
+[http://code.google.com/p/googlemock/source/browse/trunk/scripts/test/Makefile scrpts/test/Makefile] file as an example on how to compile your tests
+against them.
+
 =  Extending Google Mock =
 
 == Writing New Matchers Quickly ==
