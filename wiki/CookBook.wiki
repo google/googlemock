@@ -89,12 +89,8 @@ dependency injection_.
 
 In this case, instead of sharing a common base class with the real
 class, your mock class will be _unrelated_ to the real class, but
-contain methods with the same signatures. Then you tell your template
-code which implementation to use by instantiating it with different
-template arguments.
-
-The syntax for mocking non-virtual methods is the _same_ as mocking
-virtual methods:
+contain methods with the same signatures.  The syntax for mocking
+non-virtual methods is the _same_ as mocking virtual methods:
 
 {{{
 // A simple packet stream class.  None of its members is virtual.
@@ -119,8 +115,42 @@ class MockPacketStream {
 Note that the mock class doesn't define `AppendPacket()`, unlike the
 real class. That's fine as long as the test doesn't need to call it.
 
-This technique can only be used in *template* code, as shown in the above
-example.
+Next, you need a way to say that you want to use
+`ConcretePacketStream` in production code, and use `MockPacketStream`
+in tests.  Since the functions are not virtual and the two classes are
+unrelated, you must specify your choice at _compile time_ (as opposed
+to run time).
+
+One way to do it is to templatize your code that needs to use a packet
+stream.  More specifically, you will give your code a template type
+argument for the type of the packet stream.  In production, you will
+instantiate your template with `ConcretePacketStream` as the type
+argument.  In tests, you will instantiate the same template with
+`MockPacketStream`.  For example, you may write:
+
+{{{
+template <class PacketStream>
+void CreateConnection(PacketStream* stream) { ... }
+
+template <class PacketStream>
+class PacketReader {
+ public:
+  void ReadPackets(PacketStream* stream, size_t packet_num);
+};
+}}}
+
+Then you can use `CreateConnection<ConcretePacketStream>()` and
+`PacketReader<ConcretePacketStream>` in production code, and use
+`CreateConnection<MockPacketStream>()` and
+`PacketReader<MockPacketStream>` in tests.
+
+{{{
+  MockPacketStream mock_stream;
+  EXPECT_CALL(mock_stream, ...)...;
+  .. set more expectations on mock_stream ...
+  PacketReader<MockPacketStream> reader(&mock_stream);
+  ... exercise reader ...
+}}}
 
 == Mocking Free Functions ==
 
