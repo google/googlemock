@@ -183,7 +183,7 @@ ACTION(Foo) {
 
 ACTION_P(Bar, param) {
   // Makes sure the type of arg1 is const char*.
-  testing::StaticAssertTypeEq<const char*, arg1_type>();
+  ::testing::StaticAssertTypeEq<const char*, arg1_type>();
 
   // Makes sure param can be converted to bool.
   bool flag = param;

@@ -83,7 +83,7 @@ The typical flow is:
 
 Here is an example:
 {{{
-using testing::Return;                            // #1
+using ::testing::Return;                            // #1
 
 TEST(BarTest, DoesThis) {
   MockFoo foo;                                    // #2
@@ -108,7 +108,7 @@ returns `void`, `bool`, a numeric value, or a pointer.
 
 To customize the default action for functions with return type `T` globally:
 {{{
-using testing::DefaultValue;
+using ::testing::DefaultValue;
 
 DefaultValue<T>::Set(value);  // Sets the default value to be returned.
 // ... use the mocks ...
@@ -401,7 +401,7 @@ order. The name `dummy` is irrelevant.)
 
 Google Mock will verify the expectations on a mock object when it is destructed, or you can do it earlier:
 {{{
-using testing::Mock;
+using ::testing::Mock;
 ...
 // Verifies and removes the expectations on mock_obj;
 // returns true iff successful.

@@ -8,7 +8,7 @@ please read the ForDummies document first to make sure you understand
 the basics.
 
 *Note:* Google Mock lives in the `testing` name space. For
-readability, it is recommended to write `using testing::Foo;` once in
+readability, it is recommended to write `using ::testing::Foo;` once in
 your file before using the name `Foo` defined by Google Mock. We omit
 such `using` statements in this page for brevity, but you should do it
 in your own code.
@@ -218,7 +218,7 @@ test to use `NiceMock<MockFoo>` instead, the warning will be gone,
 resulting in a cleaner test output:
 
 {{{
-using testing::NiceMock;
+using ::testing::NiceMock;
 
 TEST(...) {
   NiceMock<MockFoo> mock_foo;
@@ -234,7 +234,7 @@ It also works if `MockFoo`'s constructor takes some arguments, as
 `NiceMock<MockFoo>` "inherits" `MockFoo`'s constructors:
 
 {{{
-using testing::NiceMock;
+using ::testing::NiceMock;
 
 TEST(...) {
   NiceMock<MockFoo> mock_foo(5, "hi");  // Calls MockFoo(5, "hi").
@@ -247,7 +247,7 @@ The usage of `StrictMock` is similar, except that it makes all
 uninteresting calls failures:
 
 {{{
-using testing::StrictMock;
+using ::testing::StrictMock;
 
 TEST(...) {
   StrictMock<MockFoo> mock_foo;
@@ -810,11 +810,11 @@ For example, in a Google Test test you can write:
 {{{
 #include <gmock/gmock.h>
 
-using testing::AllOf;
-using testing::Ge;
-using testing::Le;
-using testing::MatchesRegex;
-using testing::StartsWith;
+using ::testing::AllOf;
+using ::testing::Ge;
+using ::testing::Le;
+using ::testing::MatchesRegex;
+using ::testing::StartsWith;
 ...
 
   EXPECT_THAT(Foo(), StartsWith("Hello"));
@@ -983,7 +983,7 @@ want to constrain that the argument's `bar()` value plus its `baz()`
 value is a given number. Here's how you can define a matcher to do it:
 
 {{{
-using testing::MatcherInterface;
+using ::testing::MatcherInterface;
 
 class BarPlusBazEqMatcher : public MatcherInterface<const Foo&> {
  public:
@@ -1031,9 +1031,9 @@ container out-of-line is a bit of a hassle.
 You can use the `ElementsAre()` matcher in such cases:
 
 {{{
-using testing::_;
-using testing::ElementsAre;
-using testing::Gt;
+using ::testing::_;
+using ::testing::ElementsAre;
+using ::testing::Gt;
 ...
 
   MOCK_METHOD1(Foo, void(const vector<int>& numbers));
@@ -1050,7 +1050,7 @@ needed, you can place them in a C-style array and use
 `ElementsAreArray()` instead:
 
 {{{
-using testing::ElementsAreArray;
+using ::testing::ElementsAreArray;
 ...
 
   // ElementsAreArray accepts an array of element values.
@@ -1147,7 +1147,7 @@ expectations, put the `EXPECT_CALL()` statements in a block where you
 define a variable of type `InSequence`:
 
 {{{
-  using testing::InSequence;
+  using ::testing::InSequence;
 
   {
     InSequence s;
@@ -1309,7 +1309,7 @@ class MockFoo : public Foo {
 Sometimes a method exhibits its effect not via returning a value but
 via side effects. For example, it may change some global state or
 modify an output argument. To mock side effects, in general you can
-define your own action by implementing `testing::ActionInterface`.
+define your own action by implementing `::testing::ActionInterface`.
 
 If all you need to do is to change an output argument, the built-in
 `SetArgumentPointee()` action is convenient:
@@ -1399,7 +1399,7 @@ action if this default value doesn't work for you.
 
 Sometimes, you may want to change this default value, or you may want
 to specify a default value for types Google Mock doesn't know
-about. You can do this using the `testing::DefaultValue` class
+about. You can do this using the `::testing::DefaultValue` class
 template:
 
 {{{
@@ -1573,7 +1573,7 @@ a function pointer or a functor, Google Mock handles them both.
 With that, you could write:
 
 {{{
-using testing::InvokeArgument;
+using ::testing::InvokeArgument;
 ...
 
   EXPECT_CALL(foo, DoThis(_, _))
@@ -1590,8 +1590,8 @@ wrap it inside `ByRef()`:
   MOCK_METHOD1(Bar, bool(bool (*fp)(int, const Helper&)));
 ...
 
-using testing::ByRef;
-using testing::InvokeArgument;
+using ::testing::ByRef;
+using ::testing::InvokeArgument;
 ...
 
   MockFoo foo;
@@ -1614,7 +1614,7 @@ handy when the argument is a temporary value:
   MOCK_METHOD1(DoThat, bool(bool (*f)(const double& x, const string& s)));
 ...
 
-using testing::InvokeArgument;
+using ::testing::InvokeArgument;
 ...
 
   MockFoo foo;
@@ -1776,7 +1776,7 @@ double DistanceToOriginWithIndex(int index, double x, double y) {
 you could write 
 
 {{{
-using testing::Unused;
+using ::testing::Unused;
 
 double DistanceToOrigin(Unused, double x, double y) {
   return sqrt(x*x + y*y);
@@ -1866,7 +1866,7 @@ to _force_ Google Mock to verify a mock object before it is
 
 {{{
 TEST(MyServerTest, ProcessesRequest) {
-  using testing::Mock;
+  using ::testing::Mock;
 
   MockFoo* const foo = new MockFoo;
   EXPECT_CALL(*foo, ...)...;
@@ -2095,7 +2095,7 @@ Alternatively, you can adjust the value of that flag from within your
 tests like so:
 
 {{{
-  testing::FLAGS_gmock_verbose = "error";
+  ::testing::FLAGS_gmock_verbose = "error";
 }}}
 
 Now, judiciously use the right flag to enable Google Mock serve you better!
@@ -2325,7 +2325,7 @@ parameters).
 ==  Writing New Monomorphic Matchers ==
 
 A matcher of argument type `T` implements
-`testing::MatcherInterface<T>` and does two things: it tests whether a
+`::testing::MatcherInterface<T>` and does two things: it tests whether a
 value of type `T` matches the matcher, and can describe what kind of
 values it matches. The latter ability is used for generating readable
 error messages when expectations are violated.
@@ -2361,9 +2361,9 @@ For example, you can define a matcher to test whether an `int` is even
 and then use it like this:
 
 {{{
-using testing::MakeMatcher;
-using testing::Matcher;
-using testing::MatcherInterface;
+using ::testing::MakeMatcher;
+using ::testing::Matcher;
+using ::testing::MatcherInterface;
 
 class EvenMatcher : public MatcherInterface<int> {
  public:
@@ -2403,8 +2403,8 @@ easily with the help of `MakePolymorphicMatcher()`. Here's how you can
 define `NotNull()` as an example:
 
 {{{
-using testing::MakePolymorphicMatcher;
-using testing::PolymorphicMatcher;
+using ::testing::MakePolymorphicMatcher;
+using ::testing::PolymorphicMatcher;
 
 class NotNullMatcher {
  public:
@@ -2566,9 +2566,9 @@ For example, to specify that a call must occur even number of times,
 you can write
 
 {{{
-using testing::Cardinality;
-using testing::CardinalityInterface;
-using testing::MakeCardinality;
+using ::testing::Cardinality;
+using ::testing::CardinalityInterface;
+using ::testing::MakeCardinality;
 
 class EvenNumberCardinality : public CardinalityInterface {
  public:
@@ -2729,7 +2729,7 @@ ACTION(Foo) {
 
 ACTION_P(Bar, param) {
   // Makes sure the type of arg1 is const char*.
-  testing::StaticAssertTypeEq<const char*, arg1_type>();
+  ::testing::StaticAssertTypeEq<const char*, arg1_type>();
 
   // Makes sure param can be converted to bool.
   bool flag = param;
@@ -2765,7 +2765,7 @@ users.  They also don't allow overloading actions based on parameter
 types without jumping through some hoops.
 
 An alternative to the `ACTION*` macros is to implement
-`testing::ActionInterface<F>`, where `F` is the type of the mock
+`::testing::ActionInterface<F>`, where `F` is the type of the mock
 function in which the action will be used. For example:
 
 {{{
@@ -2781,9 +2781,9 @@ template <typename F>class ActionInterface {
   virtual Result Perform(const ArgumentTuple& args) = 0;
 };
 
-using testing::Action;
-using testing::ActionInterface;
-using testing::MakeAction;
+using ::testing::Action;
+using ::testing::ActionInterface;
+using ::testing::MakeAction;
 
 typedef int IncrementMethod(int*);
 
@@ -2857,8 +2857,8 @@ implementation class into the polymorphic action we need. It will be
 convenient to have a wrapper for this:
 
 {{{
-using testing::MakePolymorphicAction;
-using testing::PolymorphicAction;
+using ::testing::MakePolymorphicAction;
+using ::testing::PolymorphicAction;
 
 PolymorphicAction<ReturnSecondArgumentAction> ReturnSecondArgument() {
   return MakePolymorphicAction(ReturnSecondArgumentAction());
