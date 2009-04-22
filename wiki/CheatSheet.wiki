@@ -412,3 +412,14 @@ Mock::VerifyAndClearExpectations(&mock_obj);
 // returns true iff successful.
 Mock::VerifyAndClear(&mock_obj);
 }}}
+
+You can also tell Google Mock that a mock object can be leaked and doesn't
+need to be verified:
+{{{
+Mock::AllowLeak(&mock_obj);
+}}}
+
+= Flags =
+
+|| `--gmock_catch_leaked_mocks` || Reports leaked mock objects as failures.  Off by default. ||
+|| `--gmock_verbose=LEVEL` || Sets the default verbosity level (`info`, `warning`, or `error`) of Google Mock messages. ||
