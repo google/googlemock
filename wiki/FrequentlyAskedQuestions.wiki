@@ -8,6 +8,12 @@ Please send your questions to the
 group. If you need help with compiler errors, make sure you have
 tried [#How_am_I_supposed_to_make_sense_of_these_horrible_template_error Google Mock Doctor] first.
 
+== I have a huge mock class, and Microsoft Visual C++ runs out of memory when compiling it.  What can I do? ==
+
+We've noticed that when the `/clr` compiler flag is used, Visual C++
+uses 5~6 times as much memory when compiling a mock class.  We suggest
+to avoid `/clr` when compiling native C++ mocks.
+
 == When using Google Mock, do I have to use Google Test as the testing framework?  I have my favorite testing framework and don't want to switch. ==
 
 Google Mock works out of the box with Google Test.  However, it's easy
