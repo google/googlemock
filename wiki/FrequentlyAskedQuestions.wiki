@@ -8,12 +8,6 @@ Please send your questions to the
 group. If you need help with compiler errors, make sure you have
 tried [#How_am_I_supposed_to_make_sense_of_these_horrible_template_error Google Mock Doctor] first.
 
-== I have a huge mock class, and Microsoft Visual C++ runs out of memory when compiling it.  What can I do? ==
-
-We've noticed that when the `/clr` compiler flag is used, Visual C++
-uses 5~6 times as much memory when compiling a mock class.  We suggest
-to avoid `/clr` when compiling native C++ mocks.
-
 == When using Google Mock, do I have to use Google Test as the testing framework?  I have my favorite testing framework and don't want to switch. ==
 
 Google Mock works out of the box with Google Test.  However, it's easy
@@ -43,6 +37,60 @@ make my_test 2>&1 | gmd
 }}}
 
 Or you can run `gmd` and copy-n-paste gcc's error messages to it.
+
+== MSVC gives me warning C4301 when I define a mock method with a const parameter.  Why? ==
+
+If you compile this using Microsoft Visual C++ 2005 SP1:
+{{{
+class Foo {
+  ...
+  virtual void Bar(const int i) = 0;
+};
+
+class MockFoo : public Foo {
+  ...
+  MOCK_METHOD1(Bar, void(const int i));
+};
+}}}
+You may get the following warning:
+{{{
+warning C4301: 'MockFoo::Bar': overriding virtual function only differs from 'Foo::Bar' by const/volatile qualifier
+}}}
+
+This is a MSVC bug.  The same code compiles fine with gcc ,for example.
+
+In C++, if you _declare_ a function with a `const` parameter, the
+`const` modifier is _ignored_.  Therefore, the `Foo` base class above
+is equivalent to:
+{{{
+class Foo {
+  ...
+  virtual void Bar(int i) = 0;  // int or const int?  Makes no difference.
+};
+}}}
+
+In fact, you can _declare_ Bar() with an `int` parameter, and _define_
+it with a `const int` parameter.  The compiler will still match them
+up.
+
+Since making a parameter `const` is meaningless in the method
+_declaration_, we recommend to remove it in both `Foo` and `MockFoo`.
+That should workaround the VC bug.
+
+Note that we are talking about the _top-level_ `const` modifier here.
+If the function parameter is passed by pointer or reference, declaring
+the _pointee_ or _referee_ as `const` is still meaningful.  For
+example, the following two declarations are _not_ equivalent:
+{{{
+void Bar(int* p);        // Neither p nor *p is const.
+void Bar(const int* p);  // p is not const, but *p is.
+}}}
+
+== I have a huge mock class, and Microsoft Visual C++ runs out of memory when compiling it.  What can I do? ==
+
+We've noticed that when the `/clr` compiler flag is used, Visual C++
+uses 5~6 times as much memory when compiling a mock class.  We suggest
+to avoid `/clr` when compiling native C++ mocks.
 
 == I can't figure out why Google Mock thinks my expectations are not satisfied.  What should I do? ==
 
