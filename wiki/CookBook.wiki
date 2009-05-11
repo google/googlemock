@@ -2738,6 +2738,72 @@ ACTION_P(Bar, param) {
 where `StaticAssertTypeEq` is a compile-time assertion in Google Test
 that verifies two types are the same.
 
+== Writing New Action Templates Quickly ==
+
+Sometimes you want to give an action explicit template parameters that
+cannot be inferred from its value parameters.  `ACTION_TEMPLATE()`
+supports that and can be viewed as an extension to `ACTION()` and
+`ACTION_P*()`.
+
+The syntax:
+{{{
+ACTION_TEMPLATE(ActionName,
+                HAS_m_TEMPLATE_PARAMS(kind1, name1, ..., kind_m, name_m),
+                AND_n_VALUE_PARAMS(p1, ..., p_n)) { statements; }
+}}}
+
+defines an action template that takes _m_ explicit template parameters
+and _n_ value parameters, where _m_ is between 1 and 10, and _n_ is
+between 0 and 10.  `name_i` is the name of the i-th template
+parameter, and `kind_i` specifies whether it's a `typename`, an
+integral constant, or a template.  `p_i` is the name of the i-th value
+parameter.
+
+Example:
+{{{
+// DuplicateArg<k, T>(output) converts the k-th argument of the mock
+// function to type T and copies it to *output.
+ACTION_TEMPLATE(DuplicateArg,
+                // Note the comma between int and k:
+                HAS_2_TEMPLATE_PARAMS(int, k, typename, T),
+                AND_1_VALUE_PARAMS(output)) {
+  *output = T(std::tr1::get<k>(args));
+}
+}}}
+
+To create an instance of an action template, write:
+{{{
+  ActionName<t1, ..., t_m>(v1, ..., v_n)
+}}}
+where the `t`s are the template arguments and the
+`v`s are the value arguments.  The value argument
+types are inferred by the compiler.  For example:
+{{{
+  int n;
+  EXPECT_CALL(mock, Foo(_, _))
+      .WillOnce(DuplicateArg<1, unsigned char>(&n));
+}}}
+
+If you want to explicitly specify the value argument types, you can
+provide additional template arguments:
+{{{
+  ActionName<t1, ..., t_m, u1, ..., u_k>(v1, ..., v_n)
+}}}
+where `u_i` is the desired type of `v_i`.
+
+`ACTION_TEMPLATE` and `ACTION`/`ACTION_P*` can be overloaded on the
+number of value parameters, but not on the number of template
+parameters.  Without the restriction, the meaning of the following is
+unclear:
+
+{{{
+  OverloadedAction<int, bool>(x);
+}}}
+
+Are we using a single-template-parameter action where `bool` refers to
+the type of `x`, or a two-template-parameter action where the compiler
+is asked to infer the type of `x`?
+
 == Using the ACTION Object's Type ==
 
 If you are writing a function that returns an `ACTION` object, you'll
@@ -2745,14 +2811,17 @@ need to know its type.  The type depends on the macro used to define
 the action and the parameter types.  The rule is relatively simple:
 || *Given Definition* || *Expression* || *Has Type* ||
 || `ACTION(Foo)` || `Foo()` || `FooAction` ||
+|| `ACTION_TEMPLATE(Foo, HAS_m_TEMPLATE_PARAMS(...), AND_0_VALUE_PARAMS())` ||	`Foo<t1, ..., t_m>()` || `FooAction<t1, ..., t_m>` ||
 || `ACTION_P(Bar, param)` || `Bar(int_value)` || `BarActionP<int>` ||
+|| `ACTION_TEMPLATE(Bar, HAS_m_TEMPLATE_PARAMS(...), AND_1_VALUE_PARAMS(p1))` || `Bar<t1, ..., t_m>(int_value)` || `FooActionP<t1, ..., t_m, int>` ||
 || `ACTION_P2(Baz, p1, p2)` || `Baz(bool_value, int_value)` || `BazActionP2<bool, int>` ||
+|| `ACTION_TEMPLATE(Baz, HAS_m_TEMPLATE_PARAMS(...), AND_2_VALUE_PARAMS(p1, p2))` || `Baz<t1, ..., t_m>(bool_value, int_value)` || `FooActionP2<t1, ..., t_m, bool, int>` ||
 || ... || ... || ... ||
 
 Note that we have to pick different suffixes (`Action`, `ActionP`,
-`ActionP2`, and etc) for actions with different numbers of parameters,
-or the action definitions cannot be overloaded on the number of
-parameters.
+`ActionP2`, and etc) for actions with different numbers of value
+parameters, or the action definitions cannot be overloaded on the
+number of them.
 
 ==  Writing New Monomorphic Actions ==
 
