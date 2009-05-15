@@ -257,6 +257,7 @@ You can make a matcher from one or more other matchers:
 == Casting a Matcher ==
 
 ||`MatcherCast<T>(m)`||casts matcher `m` to type `Matcher<T>`.||
+||`SafeMatcherCast<T>(m)`|| [CookBook#Casting_Matchers safely casts] matcher `m` to type `Matcher<T>`. ||
 
 == Defining Matchers ==
 
