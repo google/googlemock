@@ -636,16 +636,22 @@ you!
 
 Sometimes, however, you know what you're doing and want the compiler
 to give you some slack. One example is that you have a matcher for
-`double` and the argument you want to match is `int`. While the two
+`long` and the argument you want to match is `int`. While the two
 types aren't exactly the same, there is nothing really wrong with
-using a `Matcher<double>` to match an `int` - after all, we can first
-convert the `int` argument to a `double` before giving it to the
+using a `Matcher<long>` to match an `int` - after all, we can first
+convert the `int` argument to a `long` before giving it to the
 matcher.
 
-To support this need, Google Mock gives you the `MatcherCast<T>(m)`
-function. It casts a matcher `m` to type `Matcher<T>`. In order for it
-to compile, you must be able to `static_cast` a `T` value to a value
-that `m` accepts (so that we can pass it to `m`).
+To support this need, Google Mock gives you the
+`SafeMatcherCast<T>(m)` function. It casts a matcher `m` to type
+`Matcher<T>`. To ensure safety, Google Mock checks that (let `U` be the
+type `m` accepts):
+
+  # Type `T` can be implicitly cast to type `U`;
+  # When both `T` and `U` are built-in arithmetic types (`bool`, integers, and floating-point numbers), the conversion from `T` to `U` is not lossy (in other words, any value representable by `T` can also be represented by `U`); and
+  # When `U` is a reference, `T` must also be a reference (as the underlying matcher may be interested in the address of the `U` value).
+
+The code won't compile if any of these conditions isn't met. 
 
 Here's one example:
 
@@ -662,8 +668,16 @@ class MockFoo : public Foo {
 
   MockFoo foo;
   // m is a Matcher<Base*> we got from somewhere.
-  EXPECT_CALL(foo, DoThis(MatcherCast<Derived*>(m)));
+  EXPECT_CALL(foo, DoThis(SafeMatcherCast<Derived*>(m)));
 }}}
+
+If you find `SafeMatcherCast<T>(m)` too limiting, you can use a similar
+function `MatcherCast<T>(m)`. The difference is that `MatcherCast` works
+as long as you can `static_cast` type `T` to type `U`.
+
+`MatcherCast` essentially lets you bypass C++'s type system
+(`static_cast` isn't always safe as it could throw away information,
+for example), so be careful not to misuse/abuse it.
 
 ==  Selecting Between Overloaded Functions ==
 
@@ -2061,6 +2075,7 @@ need to cooperate). This means that the execution of `action1` and
 `action2` in the above example _may_ interleave. If this is a problem,
 you should add proper synchronization logic to `action1` and `action2`
 to make the test thread-safe.
+
 
 Also, remember that `DefaultValue<T>` is a global resource that
 potentially affects _all_ living mock objects in your
