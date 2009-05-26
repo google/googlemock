@@ -38,6 +38,25 @@ make my_test 2>&1 | gmd
 
 Or you can run `gmd` and copy-n-paste gcc's error messages to it.
 
+== Can I mock a variadic function? ==
+
+You cannot mock a variadic function (i.e. a function taking ellipsis
+(`...`) arguments) directly in Google Mock.
+
+The problem is that in general, there is _no way_ for a mock object to
+know how many arguments are passed to the variadic method, and what
+the arguments' types are.  Only the _author of the base class_ knows
+the protocol, and we cannot look into his head.
+
+Therefore, to mock such a function, the _user_ must teach the mock
+object how to figure out the number of arguments and their types.  One
+way to do it is to provide overloaded versions of the function.
+
+Ellipsis arguments are inherited from C and not really a C++ feature.
+They are unsafe to use and don't work with arguments that have
+constructors or destructors.  Therefore we recommend to avoid them in
+C++ as much as possible.
+
 == MSVC gives me warning C4301 when I define a mock method with a const parameter.  Why? ==
 
 If you compile this using Microsoft Visual C++ 2005 SP1:
