@@ -422,5 +422,5 @@ Mock::AllowLeak(&mock_obj);
 
 = Flags =
 
-|| `--gmock_catch_leaked_mocks` || Reports leaked mock objects as failures.  Off by default. ||
+|| `--gmock_catch_leaked_mocks=0` || Don't report leaked mock objects as failures. ||
 || `--gmock_verbose=LEVEL` || Sets the default verbosity level (`info`, `warning`, or `error`) of Google Mock messages. ||
