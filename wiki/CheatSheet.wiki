@@ -213,10 +213,17 @@ Most STL-style containers support `==`, so you can use
 container exactly.   If you want to write the elements in-line,
 match them more flexibly, or get more informative messages, you can use:
 
-|| `Contains(e)` || `argument` contains an element equal to `e`. ||
+|| `Contains(e)` || `argument` contains an element that matches `e`, which can be either a value or a matcher. ||
 ||`ElementsAre(e0, e1, ..., en)`||`argument` has `n + 1` elements, where the i-th element matches `ei`, which can be a value or a matcher. 0 to 10 arguments are allowed.||
 ||`ElementsAreArray(array)` or `ElementsAreArray(array, count)`||The same as `ElementsAre()` except that the expected element values/matchers come from a C-style array.||
 || `ContainerEq(container)` || The same as `Eq(container)` except that the failure message also includes which elements are in one container but not the other. ||
+
+These matchers can also match:
+
+  # a native array passed by reference (e.g. in `Foo(const int (&a)[5])`), and
+  # an array passed as a pointer and a count (e.g. in `Bar(const T* buffer, int len)` -- see [#Multiargument_Matchers Multi-argument Matchers]).
+
+where the array may be multi-dimensional (i.e. its elements can be arrays). 
 
 == Member Matchers ==
 
@@ -235,7 +242,7 @@ match them more flexibly, or get more informative messages, you can use:
 
 ||`Truly(predicate)`||`predicate(argument)` returns something considered by C++ to be true, where `predicate` is a function or functor.||
 
-== Multi-argument Matchers ==
+== Multiargument Matchers ==
 
 These are matchers on tuple types. They can be used in `.WithArguments()`. The following can be used on functions with _two arguments_:
 
