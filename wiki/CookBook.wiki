@@ -756,25 +756,39 @@ be returned; otherwise `'b'` will be returned.
 
 Sometimes it's not enough to match the arguments individually. For
 example, we may want to say that the first argument must be less than
-the second argument. The `WithArguments()` clause allows us to match
+the second argument. The `With()` clause allows us to match
 all arguments of a mock function as a whole. For example,
 
 {{{
   EXPECT_CALL(foo, InRange(Ne(0), _))
-      .WithArguments(Lt());
+      .With(Lt());
 }}}
 
 says that the first argument of `InRange()` must not be 0, and must be
 less than the second argument.
 
-The expression inside `WithArguments()` must be a matcher of type
+The expression inside `With()` must be a matcher of type
 `Matcher<tr1::tuple<A1, ..., An> >`, where `A1`, ..., `An` are the
 types of the function arguments.
 
-In general, you'll need to define such a tuple matcher yourself. As a
-convenience and example, Google Mock provides some matchers for
-2-tuples, including the `Lt()` matcher above. See the CheatSheet for the
-complete list.
+You can also write `AllArgs(m)` instead of `m` inside `.With()`. The
+two forms are equivalent, but `.With(AllArgs(Lt()))` is more readable
+than `.With(Lt())`.
+
+You can use `Args<k1, ..., kn>(m)` to match the `n` selected arguments
+against `m`. For example,
+
+{{{
+  EXPECT_CALL(foo, Blah(_, _, _))
+      .With(AllOf(Args<0, 1>(Lt()), Args<1, 2>(Lt())));
+}}}
+
+says that `Blah()` will be called with arguments `x`, `y`, and `z` where
+`x < y < z`.
+
+As a convenience and example, Google Mock provides some matchers for
+2-tuples, including the `Lt()` matcher above. See the CheatSheet for
+the complete list.
 
 ==  Using Matchers as Predicates ==
 
