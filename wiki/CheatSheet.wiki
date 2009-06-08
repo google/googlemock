@@ -118,7 +118,7 @@ DefaultValue<T>::Clear();     // Resets the default value.
 To customize the default action for a particular method, use `ON_CALL()`:
 {{{
 ON_CALL(mock_object, method(matchers))
-    .WithArguments(multi_argument_matcher)  ?
+    .With(multi_argument_matcher)  ?
     .WillByDefault(action);
 }}}
 
@@ -128,12 +128,12 @@ ON_CALL(mock_object, method(matchers))
 called? What will it do?):
 {{{
 EXPECT_CALL(mock_object, method(matchers))
-    .WithArguments(multi_argument_matcher)  ?
-    .Times(cardinality)                     ?
-    .InSequence(sequences)                  *
-    .WillOnce(action)                       *
-    .WillRepeatedly(action)                 ?
-    .RetiresOnSaturation();                 ?
+    .With(multi_argument_matcher)  ?
+    .Times(cardinality)            ?
+    .InSequence(sequences)         *
+    .WillOnce(action)              *
+    .WillRepeatedly(action)        ?
+    .RetiresOnSaturation();        ?
 }}}
 
 If `Times()` is omitted, the cardinality is assumed to be:
@@ -241,7 +241,7 @@ where the array may be multi-dimensional (i.e. its elements can be arrays).
 == Multiargument Matchers ==
 
 These are matchers on tuple types. They can be used in
-`.WithArguments()`. The following can be used on functions with <i>two
+`.With()`. The following can be used on functions with <i>two
 arguments</i> `x` and `y`:
 
 ||`Eq()`||`x == y`||
@@ -251,10 +251,11 @@ arguments</i> `x` and `y`:
 ||`Lt()`||`x < y`||
 ||`Ne()`||`x != y`||
 
-You can use `Args()` to select a subset of the arguments (or reorder
-them) to participate in the matching:
+You can use the following selectors to pick a subset of the arguments
+(or reorder them) to participate in the matching:
 
-||`Args<N1, N2, ..., Nk>(m)`||the `k` selected (using 0-based indices) arguments match `m`, e.g. `Args<1, 2>(Contains(5))`.||
+||`AllArgs(m)`||Equivalent to `m`. Useful as syntactic sugar in `.With(AllArgs(m))`.||
+||`Args<N1, N2, ..., Nk>(m)`||The `k` selected (using 0-based indices) arguments match `m`, e.g. `Args<1, 2>(Contains(5))`.||
 
 == Composite Matchers ==
 
