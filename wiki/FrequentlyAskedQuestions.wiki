@@ -57,7 +57,7 @@ They are unsafe to use and don't work with arguments that have
 constructors or destructors.  Therefore we recommend to avoid them in
 C++ as much as possible.
 
-== MSVC gives me warning C4301 when I define a mock method with a const parameter.  Why? ==
+== MSVC gives me warning C4301 or C4373 when I define a mock method with a const parameter.  Why? ==
 
 If you compile this using Microsoft Visual C++ 2005 SP1:
 {{{
@@ -76,7 +76,11 @@ You may get the following warning:
 warning C4301: 'MockFoo::Bar': overriding virtual function only differs from 'Foo::Bar' by const/volatile qualifier
 }}}
 
-This is a MSVC bug.  The same code compiles fine with gcc ,for example.
+This is a MSVC bug.  The same code compiles fine with gcc ,for
+example.  If you use Visual C++ 2008 SP1, you would get the warning:
+{{{
+warning C4373: 'MockFoo::Bar': virtual function overrides 'Foo::Bar', previous versions of the compiler did not override when parameters only differed by const/volatile qualifiers
+}}}
 
 In C++, if you _declare_ a function with a `const` parameter, the
 `const` modifier is _ignored_.  Therefore, the `Foo` base class above
