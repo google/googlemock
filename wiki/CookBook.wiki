@@ -1201,9 +1201,15 @@ of `B` and `C`. In this case, the test should reflect our real intent,
 instead of being overly constraining.
 
 Google Mock allows you to impose an arbitrary DAG (directed acyclic
-graph) on the calls. The way to express the DAG is via the
-`InSequence()` clause (not the same as the `InSequence` class), which
-we borrowed from jMock 2. Here's how it works:
+graph) on the calls. One way to express the DAG is to use the
+[CheatSheet#The_After_Clause After] clause of `EXPECT_CALL`.
+
+Another way is via the `InSequence()` clause (not the same as the
+`InSequence` class), which we borrowed from jMock 2. It's less
+flexible than `After()`, but more convenient when you have long chains
+of sequential calls, as it doesn't require you to come up with
+different names for the expectations in the chains.  Here's how it
+works:
 
 If we view `EXPECT_CALL()` statements as nodes in a graph, and add an
 edge from node A to node B wherever A must occur before B, we can get
