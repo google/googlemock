@@ -131,6 +131,7 @@ EXPECT_CALL(mock_object, method(matchers))
     .With(multi_argument_matcher)  ?
     .Times(cardinality)            ?
     .InSequence(sequences)         *
+    .After(expectations)           *
     .WillOnce(action)              *
     .WillRepeatedly(action)        ?
     .RetiresOnSaturation();        ?
@@ -368,19 +369,58 @@ These are used in `Times()` to specify how many times a mock function will be ca
 ||`Between(m, n)`||The call is expected between `m` and `n` (inclusive) times.||
 ||`Exactly(n) or n`||The call is expected exactly `n` times. In particular, the call should never happen when `n` is 0.||
 
-= Sequences =
+= Expectation Order =
 
-*Sequences* specify the order of expectations. _All expected calls_ in
-the same sequence must occur in the order they are specified;
-otherwise the calls can occur in any order.
+By default, the expectations can be matched in _any_ order.  If some
+or all expectations must be matched in a given order, there are two
+ways to specify it.  They can be used either independently or
+together.
 
-To create sequences:
+== The After Clause ==
+
 {{{
-Sequence s1, s2;
+using ::testing::Expectation;
+...
+Expectation init_x = EXPECT_CALL(foo, InitX());
+Expectation init_y = EXPECT_CALL(foo, InitY());
+EXPECT_CALL(foo, Bar())
+    .After(init_x, init_y);
 }}}
+says that `Bar()` can be called only after both `InitX()` and
+`InitY()` have been called.
 
-To use sequences:
+If you don't know how many pre-requisites an expectation has when you
+write it, you can use an `ExpectationSet` to collect them:
+
 {{{
+using ::testing::ExpectationSet;
+...
+ExpectationSet all_inits;
+for (int i = 0; i < element_count; i++) {
+  all_inits += EXPECT_CALL(foo, InitElement(i));
+}
+EXPECT_CALL(foo, Bar())
+    .After(all_inits);
+}}}
+says that `Bar()` can be called only after all elements have been
+initialized (but we don't care about which elements get initialized
+before the others).
+
+Modifying an `ExpectationSet` after using it in an `.After()` doesn't
+affect the meaning of the `.After()`.
+
+== Sequences ==
+
+When you have a long chain of sequential expectations, it's easier to
+specify the order using *sequences*, which don't require you to given
+each expectation in the chain a different name.  <i>All expected
+calls</i> in the same sequence must occur in the order they are
+specified.
+
+{{{
+using ::testing::Sequence;
+Sequence s1, s2;
+...
 EXPECT_CALL(foo, Reset())
     .InSequence(s1, s2)
     .WillOnce(Return(true));
@@ -391,11 +431,12 @@ EXPECT_CALL(foo, Describe(A<const char*>()))
     .InSequence(s2)
     .WillOnce(Return("dummy"));
 }}}
-
-(`Reset()` must be called before _both_ `GetSize()` _and_ `Describe()`; the latter two can occur in any order.)
+says that `Reset()` must be called before _both_ `GetSize()` _and_
+`Describe()`, and the latter two can occur in any order.
 
 To put many expectations in a sequence conveniently:
 {{{
+using ::testing::InSequence;
 {
   InSequence dummy;
 
@@ -405,9 +446,8 @@ To put many expectations in a sequence conveniently:
   EXPECT_CALL(...)...;
 }
 }}}
-
-(All expected calls in the scope of `dummy` must occur in strict
-order. The name `dummy` is irrelevant.)
+says that all expected calls in the scope of `dummy` must occur in
+strict order. The name `dummy` is irrelevant.)
 
 = Verifying and Resetting a Mock =
 
