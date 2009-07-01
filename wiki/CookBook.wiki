@@ -2987,16 +2987,19 @@ class MockFoo : public Foo {
 ==  Teaching Google Mock How to Print Your Values ==
 
 When an uninteresting or unexpected call occurs, Google Mock prints
-the argument values to help you debug. Google Mock does this using the
-extensible value printer defined in `<gmock/gmock-printers.h>`.
+the argument values to help you debug.  The `EXPECT_THAT` and
+`ASSERT_THAT` assertions also print the value being validated when the
+test fails.  Google Mock does this using the user-extensible value
+printer defined in `<gmock/gmock-printers.h>`.
 
-This printer knows how to print the built-in C++ types plus any type
-that supports the `<<` operator. For other types, it simply prints the
-bytes in a value and hope you the user could figure it out.
+This printer knows how to print the built-in C++ types, native arrays,
+STL containers, and any type that supports the `<<` operator. For
+other types, it prints the raw bytes in the value and hope you the
+user can figure it out.
 
-Did I say that the printer is extensible? That means you can teach it
-to do a better job at printing your particular type than to dump the
-bytes. To do that, you just need to define `<<` for your type:
+Did I say that the printer is `extensible`? That means you can teach
+it to do a better job at printing your particular type than to dump
+the bytes. To do that, you just need to define `<<` for your type:
 
 {{{
 #include <iostream>
@@ -3005,7 +3008,7 @@ namespace foo {
 
 class Foo { ... };
 
-// It's important that the operator is defined in the SAME
+// It's important that the << operator is defined in the SAME
 // namespace that defines Foo.  C++'s look-up rules rely on that.
 ::std::ostream& operator<<(::std::ostream& os, const Foo& foo) {
   return os << foo.DebugString();  // Whatever needed to print foo to os.
@@ -3037,8 +3040,8 @@ void PrintTo(const Foo& foo, ::std::ostream* os) {
 }  // namespace foo
 }}}
 
-What if you have both `<<` and `PrintTo()`? You guessed it - the
-latter will override the former when Google Mock is concerned. This
-allows you to customize how the value should appear in Google Mock's
-output without affecting code that relies on the behavior of its `<<`
+What if you have both `<<` and `PrintTo()`? In this case, the latter
+will override the former when Google Mock is concerned. This allows
+you to customize how the value should appear in Google Mock's output
+without affecting code that relies on the behavior of its `<<`
 operator.
