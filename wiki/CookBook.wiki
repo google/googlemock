@@ -2105,11 +2105,11 @@ threads or when there still are mocks in action.
 ==  Controlling How Much Information Google Mock Prints ==
 
 When Google Mock sees something that has the potential of being an
-error (e.g. a mock function with no expectation is called, which is
-allowed but perhaps you forgot to explicitly ban the call), it prints
-some warning messages, including the arguments of the function and the
-return value. Hopefully this will remind you to take a look and see if
-there is indeed a problem.
+error (e.g. a mock function with no expectation is called, a.k.a. an
+uninteresting call, which is allowed but perhaps you forgot to
+explicitly ban the call), it prints some warning messages, including
+the arguments of the function and the return value. Hopefully this
+will remind you to take a look and see if there is indeed a problem.
 
 Sometimes you are confident that your tests are correct and may not
 appreciate such friendly messages. Some other times, you are debugging
