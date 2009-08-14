@@ -15,6 +15,40 @@ in your own code.
 
 =  Creating Mock Classes =
 
+== Mocking Private or Protected Methods ==
+
+You must always put a mock method definition (`MOCK_METHOD*`) in a
+`public:` section of the mock class, regardless of the method being
+mocked being `public`, `protected`, or `private` in the base class.
+This allows `ON_CALL` and `EXPECT_CALL` to reference the mock function
+from outside of the mock class.  (Yes, C++ allows a subclass to change
+the access level of a virtual function in the base class.)  Example:
+
+{{{
+class Foo {
+ public:
+  ...
+  virtual bool Transform(Gadget* g) = 0;
+
+ protected:
+  virtual void Resume();
+
+ private:
+  virtual int GetTimeOut();
+};
+
+class MockFoo : public Foo {
+ public:
+  ...
+  MOCK_METHOD1(Transform, bool(Gadget* g));
+
+  // The following must be in the public section, even though the
+  // methods are protected or private in the base class.
+  MOCK_METHOD0(Resume, void());
+  MOCK_METHOD0(GetTimeOut, int());
+};
+}}}
+
 ==  Mocking Overloaded Methods ==
 
 You can mock overloaded functions as usual. No special attention is required:
