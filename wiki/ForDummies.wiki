@@ -80,7 +80,7 @@ Using the `Turtle` interface as example, here are the simple steps you need to f
  
   # Derive a class `MockTurtle` from `Turtle`. 
   # Take a virtual function of `Turtle`. Count how many arguments it has. 
-  # Inside the child class, write `MOCK_METHODn();` (or `MOCK_CONST_METHODn();` if you are mocking a `const` method), where `n` is the number of the arguments; if you counted wrong, shame on you, and a compiler error will tell you so. 
+  # In the `public:` section of the child class, write `MOCK_METHODn();` (or `MOCK_CONST_METHODn();` if you are mocking a `const` method), where `n` is the number of the arguments; if you counted wrong, shame on you, and a compiler error will tell you so. 
   # Now comes the fun part: you take the function signature, cut-and-paste the _function name_ as the _first_ argument to the macro, and leave what's left as the _second_ argument (in case you're curious, this is the _type of the function_). 
   # Repeat until all virtual functions you want to mock are done. 
 
@@ -89,6 +89,7 @@ After the process, you should have something like:
 {{{
 #include <gmock/gmock.h>  // Brings in Google Mock.
 class MockTurtle : public Turtle {
+ public:
   ...
   MOCK_METHOD0(PenUp, void());
   MOCK_METHOD0(PenDown, void());
