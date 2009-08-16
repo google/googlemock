@@ -419,4 +419,26 @@ See this [CookBook#Mocking_Side_Effects recipe] for more details and an example.
 
 
 == My question is not in your FAQ! ==
-Ask it on our mailing list! Just mail [googlemock@googlegroups.com] and someone will answer it. You might also want to search the mailing list [http://groups.google.com/group/googlemock/topics archives] but by all means let us know if you believe your question should belong to this FAQ.
+
+If you cannot find the answer to your question in this FAQ, there are
+some other resources you can use:
+
+  # read other [http://code.google.com/p/googlemock/w/list wiki pages],
+  # search the mailing list [http://groups.google.com/group/googlemock/topics archive],
+  # ask it on [mailto:googlemock@googlegroups.com googlemock@googlegroups.com] and someone will answer it (to prevent spam, we require you to join the [http://groups.google.com/group/googlemock discussion group] before you can post.).
+
+Please note that creating an issue in the
+[http://code.google.com/p/googlemock/issues/list issue tracker] is _not_
+a good way to get your answer, as it is monitored infrequently by a
+very small number of people.
+
+When asking a question, it's helpful to provide as much of the
+following information as possible (people cannot help you if there's
+not enough information in your question):
+
+  * the version (or the revision number if you check out from SVN directly) of Google Mock you use (Google Mock is under active development, so it's possible that your problem has been solved in a later version),
+  * your operating system,
+  * the name and version of your compiler,
+  * the complete command line flags you give to your compiler,
+  * the complete compiler error messages (if the question is about compilation),
+  * the _actual_ code (ideally, a minimal but complete program) that has the problem you encounter.
