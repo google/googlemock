@@ -147,9 +147,15 @@ A method with no `EXPECT_CALL()` is free to be invoked _any number of times_, an
 
 = Matchers =
 
-A *matcher* matches a _single_ argument. Built-in matchers (where
-`argument` is the function argument) are divided into several
-categories:
+A *matcher* matches a _single_ argument.  You can use it inside
+`ON_CALL()` or `EXPECT_CALL()`, or use it to validate a value
+directly:
+
+|| `EXPECT_THAT(value, matcher)` || Asserts that `value` matches `matcher`. ||
+|| `ASSERT_THAT(value, matcher)` || The same as `EXPECT_THAT(value, matcher)`, except that it generates a *fatal* failure. ||
+
+Built-in matchers (where `argument` is the function argument) are
+divided into several categories:
 
 == Wildcard ==
 ||`_`||`argument` can be any value of the correct type.||
