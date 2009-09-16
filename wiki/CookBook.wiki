@@ -3085,3 +3085,16 @@ will override the former when Google Mock is concerned. This allows
 you to customize how the value should appear in Google Mock's output
 without affecting code that relies on the behavior of its `<<`
 operator.
+
+*Note:* When printing a pointer of type `T*`, Google Mock calls
+`PrintTo(T*, std::ostream* os)` instead of `operator<<(std::ostream&, T*)`.
+Therefore the only way to affect how a pointer is printed by Google
+Mock is to define `PrintTo()` for it. Also note that `T*` and `const T*`
+are different types, so you may need to define `PrintTo()` for both.
+
+Why does Google Mock treat pointers specially? There are several reasons:
+
+  * We cannot use `operator<<` to print a `signed char*` or `unsigned char*`, since it will print the pointer as a NUL-terminated C string, which likely will cause an access violation.
+  * We want `NULL` pointers to be printed as `"NULL"`, but `operator<<` prints it as `"0"`, `"nullptr"`, or something else, depending on the compiler.
+  * With some compilers, printing a `NULL` `char*` using `operator<<` will segfault.
+  * `operator<<` prints a function pointer as a `bool` (hence it always prints `"1"`), which is not very useful.
