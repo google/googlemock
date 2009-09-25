@@ -1995,31 +1995,31 @@ and want to verify that `Foo(1)` and `Foo(3)` both invoke
 `mock.Bar("a")`, but `Foo(2)` doesn't invoke anything. You can write:
 
 {{{
-class CheckPoint {
-  MOCK_METHOD1(Check, void(const string& id));
-};
+using ::testing::MockFunction;
 
 TEST(FooTest, InvokesBarCorrectly) {
   MyMock mock;
-  CheckPoint check;
+  // Class MockFunction<F> has exactly one mock method.  It is named
+  // Call() and has type F.
+  MockFunction<void(string check_point_name)> check;
   {
     InSequence s;
 
     EXPECT_CALL(mock, Bar("a"));
-    EXPECT_CALL(check, Check("1"));
-    EXPECT_CALL(check, Check("2"));
+    EXPECT_CALL(check, Call("1"));
+    EXPECT_CALL(check, Call("2"));
     EXPECT_CALL(mock, Bar("a"));
   }
   Foo(1);
-  check.Check("1");
+  check.Call("1");
   Foo(2);
-  check.Check("2");
+  check.Call("2");
   Foo(3);
 }
 }}}
 
 The expectation spec says that the first `Bar("a")` must happen before
-check point 1, the second `Bar("a")` must happen after check point 2,
+check point "1", the second `Bar("a")` must happen after check point "2",
 and nothing should happen between the two check points. The explicit
 check points make it easy to tell which `Bar("a")` is called by which
 call to `Foo()`.
