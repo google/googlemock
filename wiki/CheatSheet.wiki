@@ -480,6 +480,17 @@ need to be verified:
 Mock::AllowLeak(&mock_obj);
 }}}
 
+= Mock Classes =
+
+Google Mock defines a convenient mock class template
+{{{
+class MockFunction<R(A1, ..., An)> {
+ public:
+  MOCK_METHODn(Call, R(A1, ..., An));
+};
+}}}
+See this [CookBook#Using_Check_Points recipe] for one application of it.
+
 = Flags =
 
 || `--gmock_catch_leaked_mocks=0` || Don't report leaked mock objects as failures. ||
