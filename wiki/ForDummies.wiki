@@ -184,6 +184,8 @@ int main(int argc, char** argv) {
 }
 }}}
 
+Or, you can use Google Test's [http://code.google.com/p/googletest/wiki/GoogleTestAdvancedGuide#Extending_Google_Test_by_Handling_Test_Events event listener API] to customize how you want Google Mock failures to be handled.
+
 =  Setting Expectations =
 The key to using a mock object successfully is to set the _right expectations_ on it. If you set the expectations too strict, your test will fail as the result of unrelated changes. If you set them too loose, bugs can slip through. You want to do it just right such that your test can catch exactly the kind of bugs you intend it to catch. Google Mock provides the necessary means for you to do it "just right."
 
