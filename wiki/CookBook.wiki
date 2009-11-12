@@ -1459,6 +1459,46 @@ class MockRolodex : public Rolodex {
       .WillOnce(SetArrayArgument<0>(names.begin(), names.end()));
 }}}
 
+==  Changing a Mock Object's Behavior Based on the State ==
+
+If you expect a call to change the behavior of a mock object, you can use `::testing::InSequence` to specify different behaviors before and after the call: 
+
+{{{
+using ::testing::InSequence;
+using ::testing::Return;
+
+...
+  {
+    InSequence seq;
+    EXPECT_CALL(my_mock, IsDirty())
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(my_mock, Flush());
+    EXPECT_CALL(my_mock, IsDirty())
+        .WillRepeatedly(Return(false));
+  }
+  my_mock.FlushIfDirty();
+}}}
+
+This makes `my_mock.IsDirty()` return `true` before `my_mock.Flush()` is called and return `false` afterwards. 
+
+If the behavior change is more complex, you can store the effects in a variable and make a mock method get its return value from that variable: 
+
+{{{
+using ::testing::SaveArg;
+using ::testing::Return;
+
+ACTION_P(ReturnPointee, p) { return *p; }
+...
+  int previous_value = 0;
+  EXPECT_CALL(my_mock, GetPrevValue())
+      .WillRepeatedly(ReturnPointee(&previous_value));
+  EXPECT_CALL(my_mock, UpdateValue(_))
+      .WillRepeatedly(SaveArg<0>(&previous_value));
+  my_mock.DoSomethingToUpdateValue();
+}}}
+
+Here `my_mock.GetPrevValue()` will always return the argument of the last `UpdateValue()` call.
+
 ==  Setting the Default Value for a Return Type ==
 
 If a mock method's return type is a built-in C++ type or pointer, by
