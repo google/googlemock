@@ -169,8 +169,8 @@ divided into several categories:
 ||`Le(value)`||`argument <= value`||
 ||`Lt(value)`||`argument < value`||
 ||`Ne(value)`||`argument != value`||
-||`IsNull()`||`argument` is `NULL`.||
-||`NotNull()`||`argument` is a non-null pointer.||
+||`IsNull()`||`argument` is a `NULL` pointer (raw or smart).||
+||`NotNull()`||`argument` is a non-null pointer (raw or smart).||
 ||`Ref(variable)`||`argument` is a reference to `variable`.||
 ||`TypedEq<type>(value)`||`argument` has type `type` and is equal to `value`. You may need to use this instead of `Eq(value)` when the mock function is overloaded.||
 
