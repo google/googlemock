@@ -442,6 +442,9 @@ delegate its default action to a fake class you already have, using
 this pattern:
 
 {{{
+using ::testing::_;
+using ::testing::Invoke;
+
 class MockFoo : public Foo {
  public:
   // Normal mock method definitions using Google Mock.
@@ -466,6 +469,8 @@ that if you don't explicitly set an action in an `ON_CALL()` or
 `EXPECT_CALL()`, the fake will be called upon to do it:
 
 {{{
+using ::testing::_;
+
 TEST(AbcTest, Xyz) {
   MockFoo foo;
   foo.DelegateToFake(); // Enables the fake for delegation.
@@ -519,6 +524,10 @@ delegating-to-fake technique, the difference being that we use a real
 object instead of a fake. Here's an example:
 
 {{{
+using ::testing::_;
+using ::testing::AtLeast;
+using ::testing::Invoke;
+
 class MockFoo : public Foo {
  public:
   MockFoo() {
@@ -601,6 +610,9 @@ class MockFoo : public Foo {
 Now, you can call `Foo::Concrete()` inside an action by:
 
 {{{
+using ::testing::_;
+using ::testing::Invoke;
+...
   EXPECT_CALL(foo, Concrete(_))
       .WillOnce(Invoke(&foo, &MockFoo::FooConcrete));
 }}}
@@ -608,6 +620,8 @@ Now, you can call `Foo::Concrete()` inside an action by:
 or tell the mock object that you don't want to mock `Concrete()`:
 
 {{{
+using ::testing::Invoke;
+...
   ON_CALL(foo, Concrete(_))
       .WillByDefault(Invoke(&foo, &MockFoo::FooConcrete));
 }}}
@@ -624,6 +638,8 @@ works.)
 You can specify exactly which arguments a mock method is expecting:
   
 {{{
+using ::testing::Return;
+...
   EXPECT_CALL(foo, DoThis(5))
       .WillOnce(Return('a'));
   EXPECT_CALL(foo, DoThat("Hello", bar));
@@ -634,6 +650,10 @@ You can specify exactly which arguments a mock method is expecting:
 You can use matchers to match arguments that have a certain property:
 
 {{{
+using ::testing::Ge;
+using ::testing::NotNull;
+using ::testing::Return;
+...
   EXPECT_CALL(foo, DoThis(Ge(5)))  // The argument must be >= 5.
       .WillOnce(Return('a'));
   EXPECT_CALL(foo, DoThat("Hello", NotNull()));
@@ -643,6 +663,9 @@ You can use matchers to match arguments that have a certain property:
 A frequently used matcher is `_`, which matches anything:
 
 {{{
+using ::testing::_;
+using ::testing::NotNull;
+...
   EXPECT_CALL(foo, DoThat(_, NotNull()));
 }}}
 
@@ -652,6 +675,12 @@ You can build complex matchers from existing ones using `AllOf()`,
 `AnyOf()`, and `Not()`:
 
 {{{
+using ::testing::AllOf;
+using ::testing::Gt;
+using ::testing::HasSubstr;
+using ::testing::Ne;
+using ::testing::Not;
+...
   // The argument must be > 5 and != 10.
   EXPECT_CALL(foo, DoThis(AllOf(Gt(5),
                                 Ne(10))));
@@ -690,6 +719,8 @@ The code won't compile if any of these conditions isn't met.
 Here's one example:
 
 {{{
+using ::testing::SafeMatcherCast;
+
 // A base class and a child class.
 class Base { ... };
 class Derived : public Base { ... };
@@ -722,6 +753,8 @@ To disambiguate functions overloaded on the const-ness of this object,
 use the `Const()` argument wrapper.
 
 {{{
+using ::testing::ReturnRef;
+
 class MockFoo : public Foo {
   ...
   MOCK_METHOD0(GetBar, Bar&());
@@ -747,6 +780,11 @@ using a matcher whose type is fixed (`TypedEq<type>`, `An<type>()`,
 etc):
 
 {{{
+using ::testing::An;
+using ::testing::Lt;
+using ::testing::Matcher;
+using ::testing::TypedEq;
+
 class MockPrinter : public Printer {
  public:
   MOCK_METHOD1(Print, void(int n));
@@ -774,6 +812,10 @@ can make a method do different things depending on its argument values
 like this:
 
 {{{
+using ::testing::_;
+using ::testing::Lt;
+using ::testing::Return;
+...
   // The default case.
   EXPECT_CALL(foo, DoThis(_))
       .WillRepeatedly(Return('b'));
@@ -794,6 +836,10 @@ the second argument. The `With()` clause allows us to match
 all arguments of a mock function as a whole. For example,
 
 {{{
+using ::testing::_;
+using ::testing::Lt;
+using ::testing::Ne;
+...
   EXPECT_CALL(foo, InRange(Ne(0), _))
       .With(Lt());
 }}}
@@ -813,6 +859,11 @@ You can use `Args<k1, ..., kn>(m)` to match the `n` selected arguments
 against `m`. For example,
 
 {{{
+using ::testing::_;
+using ::testing::AllOf;
+using ::testing::Args;
+using ::testing::Lt;
+...
   EXPECT_CALL(foo, Blah(_, _, _))
       .With(AllOf(Args<0, 1>(Lt()), Args<1, 2>(Lt())));
 }}}
@@ -914,6 +965,8 @@ you want. You do this by wrapping the predicate inside the `Truly()`
 function, for example:
 
 {{{
+using ::testing::Truly;
+
 int IsEven(int n) { return (n % 2) == 0 ? 1 : 0; }
 ...
 
@@ -942,6 +995,10 @@ the `EXPECT_CALL()` is executed. Just tell Google Mock that it should
 save a reference to `bar`, instead of a copy of it. Here's how:
 
 {{{
+using ::testing::Eq;
+using ::testing::ByRef;
+using ::testing::Lt;
+...
   // Expects that Foo()'s argument == bar.
   EXPECT_CALL(mock_obj, Foo(Eq(ByRef(bar))));
 
@@ -1008,6 +1065,9 @@ Well, you can use the `Pointee(m)` matcher.
 points to. For example:
 
 {{{
+using ::testing::Ge;
+using ::testing::Pointee;
+...
   EXPECT_CALL(foo, Bar(Pointee(Ge(3))));
 }}}
 
@@ -1129,6 +1189,8 @@ array size cannot be inferred by the compiler), you can give
 `ElementsAreArray()` an additional argument to specify the array size:
 
 {{{
+using ::testing::ElementsAreArray;
+...
   int* const expected_vector3 = new int[count];
   ... fill expected_vector3 with values ...
   EXPECT_CALL(mock, Foo(ElementsAreArray(expected_vector3, count)));
@@ -1179,6 +1241,8 @@ any `EXPECT_CALL()` statement, it will be an error.
 If a mock method shouldn't be called at all, explicitly say so:
 
 {{{
+using ::testing::_;
+...
   EXPECT_CALL(foo, Bar(_))
       .Times(0);
 }}}
@@ -1187,6 +1251,9 @@ If some calls to the method are allowed, but the rest are not, just
 list all the expected calls:
 
 {{{
+using ::testing::AnyNumber;
+using ::testing::Gt;
+...
   EXPECT_CALL(foo, Bar(5));
   EXPECT_CALL(foo, Bar(Gt(10)))
       .Times(AnyNumber());
@@ -1209,6 +1276,7 @@ expectations, put the `EXPECT_CALL()` statements in a block where you
 define a variable of type `InSequence`:
 
 {{{
+  using ::testing::_;
   using ::testing::InSequence;
 
   {
@@ -1259,6 +1327,8 @@ of. Expectations in the same sequence must occur in the order they are
 written. For example,
 
 {{{
+  using ::testing::Sequence;
+
   Sequence s1, s2;
 
   EXPECT_CALL(foo, A())
@@ -1293,6 +1363,9 @@ becomes inactive (aka _retires_) when a call that has to occur later
 has occurred. For example, in
 
 {{{
+  using ::testing::_;
+  using ::testing::Sequence;
+
   Sequence s1, s2;
 
   EXPECT_CALL(log, Log(WARNING, _, "File too large."))     // #1
@@ -1311,6 +1384,8 @@ Note that an expectation doesn't retire automatically when it's
 saturated. For example,
 
 {{{
+using ::testing::_;
+...
   EXPECT_CALL(log, Log(WARNING, _, _));                  // #1
   EXPECT_CALL(log, Log(WARNING, _, "File too large."));  // #2
 }}}
@@ -1323,6 +1398,8 @@ If this is not what you want, you can ask an expectation to retire as
 soon as it becomes saturated:
 
 {{{
+using ::testing::_;
+...
   EXPECT_CALL(log, Log(WARNING, _, _));                 // #1
   EXPECT_CALL(log, Log(WARNING, _, "File too large."))  // #2
       .RetiresOnSaturation();
@@ -1340,6 +1417,8 @@ If a mock function's return type is a reference, you need to use
 `ReturnRef()` instead of `Return()` to return a result:
 
 {{{
+using ::testing::ReturnRef;
+
 class MockFoo : public Foo {
  public:
   MOCK_METHOD0(GetBar, Bar&());
@@ -1359,6 +1438,8 @@ fine. `DoAll()` allow you to do sequence of actions every time. Only
 the return value of the last action in the sequence will be used.
 
 {{{
+using ::testing::DoAll;
+
 class MockFoo : public Foo {
  public:
   MOCK_METHOD1(Bar, bool(int n));
@@ -1383,6 +1464,8 @@ If all you need to do is to change an output argument, the built-in
 `SetArgumentPointee()` action is convenient:
 
 {{{
+using ::testing::SetArgumentPointee;
+
 class MockMutator : public Mutator {
  public:
   MOCK_METHOD2(Mutate, void(bool mutate, int* value));
@@ -1408,6 +1491,10 @@ If the mock method also needs to return a value as well, you can chain
 `SetArgumentPointee()` with `Return()` using `DoAll()`:
 
 {{{
+using ::testing::_;
+using ::testing::Return;
+using ::testing::SetArgumentPointee;
+
 class MockMutator : public Mutator {
  public:
   ...
@@ -1427,6 +1514,9 @@ elements in source range `[first, last)` to the array pointed to by
 the `N`-th (0-based) argument:
 
 {{{
+using ::testing::NotNull;
+using ::testing::SetArrayArgument;
+
 class MockArrayMutator : public ArrayMutator {
  public:
   MOCK_METHOD2(Mutate, void(int* values, int num_values));
@@ -1443,6 +1533,9 @@ class MockArrayMutator : public ArrayMutator {
 This also works when the argument is an output iterator:
 
 {{{
+using ::testing::_;
+using ::testing::SeArrayArgument;
+
 class MockRolodex : public Rolodex {
  public:
   MOCK_METHOD1(GetNames, void(std::back_insert_iterator<vector<string> >));
@@ -1484,6 +1577,7 @@ This makes `my_mock.IsDirty()` return `true` before `my_mock.Flush()` is called 
 If the behavior change is more complex, you can store the effects in a variable and make a mock method get its return value from that variable: 
 
 {{{
+using ::testing::_;
 using ::testing::SaveArg;
 using ::testing::Return;
 
@@ -1547,6 +1641,11 @@ have different behaviors. The `ON_CALL()` macro allows you to
 customize your mock's behavior at the method level:
 
 {{{
+using ::testing::_;
+using ::testing::AnyNumber;
+using ::testing::Gt;
+using ::testing::Return;
+...
   ON_CALL(foo, Sign(_))
       .WillByDefault(Return(-1));
   ON_CALL(foo, Sign(0))
@@ -1575,6 +1674,9 @@ If the built-in actions don't suit you, you can easily use an existing
 function, method, or functor as an action:
 
 {{{
+using ::testing::_;
+using ::testing::Invoke;
+
 class MockFoo : public Foo {
  public:
   MOCK_METHOD2(Sum, int(int x, int y));
@@ -1627,6 +1729,9 @@ that it doesn't pass the mock function's arguments to the
 callee. Here's an example:
 
 {{{
+using ::testing::_;
+using ::testing::InvokeWithoutArgs;
+
 class MockFoo : public Foo {
  public:
   MOCK_METHOD1(ComplexJob, bool(int n));
@@ -1657,6 +1762,8 @@ class MockFoo : public Foo {
 and you may want to invoke this callable argument:
 
 {{{
+using ::testing::_;
+...
   MockFoo foo;
   EXPECT_CALL(foo, DoThis(_, _))
       .WillOnce(...);
@@ -1681,9 +1788,9 @@ a function pointer or a functor, Google Mock handles them both.
 With that, you could write:
 
 {{{
+using ::testing::_;
 using ::testing::InvokeArgument;
 ...
-
   EXPECT_CALL(foo, DoThis(_, _))
       .WillOnce(InvokeArgument<1>(5));
   // Will execute (*fp)(5), where fp is the
@@ -1697,7 +1804,7 @@ wrap it inside `ByRef()`:
 ...
   MOCK_METHOD1(Bar, bool(bool (*fp)(int, const Helper&)));
 ...
-
+using ::testing::_;
 using ::testing::ByRef;
 using ::testing::InvokeArgument;
 ...
@@ -1721,7 +1828,7 @@ handy when the argument is a temporary value:
 ...
   MOCK_METHOD1(DoThat, bool(bool (*f)(const double& x, const string& s)));
 ...
-
+using ::testing::_;
 using ::testing::InvokeArgument;
 ...
 
@@ -1745,6 +1852,10 @@ function that returns `void`, or perhaps it needs to be used in
 you do that. For example:
 
 {{{
+using ::testing::_;
+using ::testing::Invoke;
+using ::testing::Return;
+
 int Process(const MyData& data);
 string DoSomething();
 
@@ -1778,6 +1889,9 @@ you have a custom action that you want to invoke when `Foo()` is
 called. Trouble is, the custom action only wants three arguments:
 
 {{{
+using ::testing::_;
+using ::testing::Invoke;
+...
   MOCK_METHOD7(Foo, bool(bool visible, const string& name, int x, int y,
                          const map<pair<int, int>, double>& weight,
                          double min_weight, double max_wight));
@@ -1797,6 +1911,9 @@ the same signature as `Foo()` and calls the custom action with the
 right arguments:
 
 {{{
+using ::testing::_;
+using ::testing::Invoke;
+
 bool MyIsVisibleInQuadrant1(bool visible, const string& name, int x, int y,
                             const map<pair<int, int>, double>& weight,
                             double min_weight, double max_wight) {
@@ -1823,6 +1940,10 @@ the given indices (0-based) to the inner `action` and performs
 it. Using `WithArgs`, our original example can be written as:
 
 {{{
+using ::testing::_;
+using ::testing::Invoke;
+using ::testing::WithArgs;
+...
   EXPECT_CALL(mock, Foo(_, _, _, _, _, _, _))
       .WillOnce(WithArgs<0, 2, 3>(Invoke(IsVisibleInQuadrant1)));
       // No need to define your own adaptor.
@@ -1866,6 +1987,9 @@ given
 instead of
 
 {{{
+using ::testing::_;
+using ::testing::Invoke;
+
 double DistanceToOriginWithLabel(const string& label, double x, double y) {
   return sqrt(x*x + y*y);
 }
@@ -1884,6 +2008,8 @@ double DistanceToOriginWithIndex(int index, double x, double y) {
 you could write 
 
 {{{
+using ::testing::_;
+using ::testing::Invoke;
 using ::testing::Unused;
 
 double DistanceToOrigin(Unused, double x, double y) {
@@ -2513,6 +2639,7 @@ define `NotNull()` as an example:
 
 {{{
 using ::testing::MakePolymorphicMatcher;
+using ::testing::NotNull;
 using ::testing::PolymorphicMatcher;
 
 class NotNullMatcher {
@@ -2554,6 +2681,10 @@ When a mock function argument fails to match an expectation, Google
 Mock will print the matcher description and the argument, for example:
 
 {{{
+using ::testing::_;
+using ::testing::Gt;
+using ::testing::Le;
+...
   EXPECT_CALL(mock_foo, Bar(_, Le(1), Gt(5)));
 ...
   mock_foo.Bar(true, 0, 3);
@@ -2888,6 +3019,8 @@ where the `t`s are the template arguments and the
 `v`s are the value arguments.  The value argument
 types are inferred by the compiler.  For example:
 {{{
+using ::testing::_;
+...
   int n;
   EXPECT_CALL(mock, Foo(_, _))
       .WillOnce(DuplicateArg<1, unsigned char>(&n));
@@ -2959,6 +3092,7 @@ template <typename F>class ActionInterface {
   virtual Result Perform(const ArgumentTuple& args) = 0;
 };
 
+using ::testing::_;
 using ::testing::Action;
 using ::testing::ActionInterface;
 using ::testing::MakeAction;
@@ -3047,6 +3181,8 @@ Now, you can use this polymorphic action the same way you use the
 built-in ones:
 
 {{{
+using ::testing::_;
+
 class MockFoo : public Foo {
  public:
   MOCK_METHOD2(DoThis, int(bool flag, int n));
