@@ -291,7 +291,11 @@ You can make a matcher from one or more other matchers:
 || `MATCHER_P(IsDivisibleBy, n, "") { return (arg % n) == 0; }` || Defines a macher `IsDivisibleBy(n)` to match a number divisible by `n`. ||
 || `MATCHER_P2(IsBetween, a, b, "is between %(a)s and %(b)s") { return a <= arg && arg <= b; }` || Defines a matcher `IsBetween(a, b)` to match a value in the range [`a`, `b`]. ||
 
-The `MATCHER*` macros cannot be used inside a function or class.
+*Notes:*
+
+  # The `MATCHER*` macros cannot be used inside a function or class.
+  # The matcher body must be _purely functional_ (i.e. it cannot have any side effect, and the result must not depend on anything other than the value being matched and the matcher parameters).
+  # You may need to use the fully qualified form of other Google Mock utilities like, `::testing::Matches`, to avoid conflicting with similarly named functions in the generated matcher class. 
 
 == Matchers as Test Assertions ==
 
