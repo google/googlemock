@@ -2423,15 +2423,10 @@ If the above assertion fails, it will print something like:
 where the description `"is even"` is automatically calculated from the
 matcher name `IsEven`.
 
-Note that the type of the value being matched (`arg_type`) is
-determined by the context in which you use the matcher and is
-supplied to you by the compiler, so you don't need to worry about
-declaring it (nor can you).  This allows the matcher to be
-polymorphic.  For example, `IsEven()` can be used to match any type
-where the value of `(arg % 2) == 0` can be implicitly converted to
-a `bool`.  In the `Bar(IsEven())` example above, if method `Bar()`
-takes an `int`, `arg_type` will be `int`; if it takes an `unsigned long`,
-`arg_type` will be `unsigned long`; and so on.
+*Notes:*
+
+  # The type of the value being matched (`arg_type`) is determined by the context in which you use the matcher and is supplied to you by the compiler, so you don't need to worry about declaring it (nor can you).  This allows the matcher to be polymorphic.  For example, `IsEven()` can be used to match any type where the value of `(arg % 2) == 0` can be implicitly converted to a `bool`.  In the `Bar(IsEven())` example above, if method `Bar()` takes an `int`, `arg_type` will be `int`; if it takes an `unsigned long`, `arg_type` will be `unsigned long`; and so on.
+  # Google Mock doesn't guarantee when or how many times a matcher will be invoked. Therefore the matcher logic must be _purely functional_ (i.e. it cannot have any side effect, and the result must not depend on anything other than the value being matched and the matcher parameters). This requirement must be satisfied no matter how you define the matcher (e.g. using one of the methods described in the following recipes). 
 
 == Writing New Parameterized Matchers Quickly ==
 
