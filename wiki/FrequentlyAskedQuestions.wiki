@@ -129,16 +129,6 @@ EXPECT_CALL(foo, Bar(_))
     .Times(0);
 }}}
 
-== Eq(NULL) doesn't compile as the compiler isn't sure about the type of NULL.  Can we add a matcher to check for NULL arguments? ==
-
-We could, but it's not really necessary as you could simply write
-`NULL` as a matcher that matches a null pointer, as in:
-
-{{{
-EXPECT_CALL(foo, Bar(_, NULL));
-// The first argument can be anything; the second argument must be NULL.
-}}}
-
 == I have a failed test where Google Mock tells me TWICE that a particular expectation is not satisfied.  Isn't this redundant? ==
 
 When Google Mock detects a failure, it prints relevant information
