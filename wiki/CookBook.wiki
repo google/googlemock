@@ -1106,13 +1106,15 @@ value is a given number. Here's how you can define a matcher to do it:
 
 {{{
 using ::testing::MatcherInterface;
+using ::testing::MatchResultListener;
 
 class BarPlusBazEqMatcher : public MatcherInterface<const Foo&> {
  public:
   explicit BarPlusBazEqMatcher(int expected_sum)
       : expected_sum_(expected_sum) {}
 
-  virtual bool Matches(const Foo& foo) const {
+  virtual bool MatchAndExplain(const Foo& foo,
+                               MatchResultListener* listener) const {
     return (foo.bar() + foo.baz()) == expected_sum_;
   }
 
@@ -2402,30 +2404,57 @@ description.
 
 For example:
 {{{
-MATCHER(IsEven, "") { return (arg % 2) == 0; }
+MATCHER(IsDivisibleBy7, "") { return (arg % 7) == 0; }
 }}}
 allows you to write
 {{{
-  // Expects mock_foo.Bar(n) to be called where n is even.
-  EXPECT_CALL(mock_foo, Bar(IsEven()));
+  // Expects mock_foo.Bar(n) to be called where n is divisible by 7.
+  EXPECT_CALL(mock_foo, Bar(IsDivisibleBy7()));
 }}}
 or,
 {{{
-  // Verifies that the value of some_expression is even.
-  EXPECT_THAT(some_expression, IsEven());
+  // Verifies that the value of some_expression is divisible by 7.
+  EXPECT_THAT(some_expression, IsDivisibleBy7());
 }}}
 If the above assertion fails, it will print something like:
 {{{
   Value of: some_expression
-  Expected: is even
-    Actual: 7
+  Expected: is divisible by 7
+    Actual: 27
 }}}
-where the description `"is even"` is automatically calculated from the
-matcher name `IsEven`.
+where the description `"is divisible by 7"` is automatically calculated from the
+matcher name `IsDivisibleBy7`.
+
+Optionally, you can stream additional information to a hidden argument
+named `result_listener` to explain the match result. For example, a
+better definition of `IsDivisibleBy7` is:
+{{{
+MATCHER(IsDivisibleBy7, "") {
+  if ((arg % 7) == 0)
+    return true;
+
+  *result_listener << "the remainder is " << (arg % 7);
+  return false;
+}
+}}}
+
+With this definition, the above assertion will give a better message:
+{{{
+  Value of: some_expression
+  Expected: is divisible by 7
+    Actual: 27 (the remainder is 6)
+}}}
+
+You should let `MatchAndExplain()` print _any additional information_
+that can help a user understand the match result. Note that it should
+explain why the match succeeds in case of a success (unless it's
+obvious) - this is useful when the matcher is used inside
+`Not()`. There is no need to print the argument value itself, as
+Google Mock already prints it for you.
 
 *Notes:*
 
-  # The type of the value being matched (`arg_type`) is determined by the context in which you use the matcher and is supplied to you by the compiler, so you don't need to worry about declaring it (nor can you).  This allows the matcher to be polymorphic.  For example, `IsEven()` can be used to match any type where the value of `(arg % 2) == 0` can be implicitly converted to a `bool`.  In the `Bar(IsEven())` example above, if method `Bar()` takes an `int`, `arg_type` will be `int`; if it takes an `unsigned long`, `arg_type` will be `unsigned long`; and so on.
+  # The type of the value being matched (`arg_type`) is determined by the context in which you use the matcher and is supplied to you by the compiler, so you don't need to worry about declaring it (nor can you).  This allows the matcher to be polymorphic.  For example, `IsDivisibleBy7()` can be used to match any type where the value of `(arg % 7) == 0` can be implicitly converted to a `bool`.  In the `Bar(IsDivisibleBy7())` example above, if method `Bar()` takes an `int`, `arg_type` will be `int`; if it takes an `unsigned long`, `arg_type` will be `unsigned long`; and so on.
   # Google Mock doesn't guarantee when or how many times a matcher will be invoked. Therefore the matcher logic must be _purely functional_ (i.e. it cannot have any side effect, and the result must not depend on anything other than the value being matched and the matcher parameters). This requirement must be satisfied no matter how you define the matcher (e.g. using one of the methods described in the following recipes). 
 
 == Writing New Parameterized Matchers Quickly ==
@@ -2563,13 +2592,26 @@ error messages when expectations are violated.
 The interface looks like this:
 
 {{{
+class MatchResultListener {
+ public:
+  ...
+  // Streams x to the underlying ostream; does nothing if the ostream
+  // is NULL.
+  template <typename T>
+  MatchResultListener& operator<<(const T& x);
+
+  // Returns the underlying ostream.
+  ::std::ostream* stream();
+};
+
 template <typename T>
 class MatcherInterface {
  public:
   virtual ~MatcherInterface();
 
-  // Returns true iff the matcher matches x.
-  virtual bool Matches(T x) const = 0;
+  // Returns true iff the matcher matches x; also explains the match
+  // result to 'listener'.
+  virtual bool MatchAndExplain(T x, MatchResultListener* listener) const = 0;
 
   // Describes this matcher to an ostream.
   virtual void DescribeTo(::std::ostream* os) const = 0;
@@ -2587,46 +2629,72 @@ two steps: first implement the matcher interface, and then define a
 factory function to create a matcher instance. The second step is not
 strictly needed but it makes the syntax of using the matcher nicer.
 
-For example, you can define a matcher to test whether an `int` is even
-and then use it like this:
-
+For example, you can define a matcher to test whether an `int` is
+divisible by 7 and then use it like this:
 {{{
 using ::testing::MakeMatcher;
 using ::testing::Matcher;
 using ::testing::MatcherInterface;
+using ::testing::MatchResultListener;
 
-class EvenMatcher : public MatcherInterface<int> {
+class DivisibleBy7Matcher : public MatcherInterface<int> {
  public:
-  virtual bool Matches(int n) const {
-    return (n % 2) == 0;
+  virtual bool MatchAndExplain(int n, MatchResultListener* listener) const {
+    return (n % 7) == 0;
   }
 
   virtual void DescribeTo(::std::ostream* os) const {
-    *os << "is an even number";
+    *os << "is divisible by 7";
   }
 
   virtual void DescribeNegationTo(::std::ostream* os) const {
-    *os << "is an odd number";
+    *os << "is not divisible by 7";
   }
 };
 
-inline Matcher<int> Even() {
-  return MakeMatcher(new EvenMatcher);
+inline Matcher<int> DivisibleBy7() {
+  return MakeMatcher(new DivisibleBy7Matcher);
 }
 ...
 
-  EXPECT_CALL(foo, Bar(Even()));
+  EXPECT_CALL(foo, Bar(DivisibleBy7()));
+}}}
+
+You may improve the matcher message by streaming additional
+information to the `listener` argument in `MatchAndExplain()`:
+
+{{{
+class DivisibleBy7Matcher : public MatcherInterface<int> {
+ public:
+  virtual bool MatchAndExplain(int n,
+                               MatchResultListener* listener) const {
+    const int remainder = n % 7;
+    if (remainder != 0) {
+      *listener << "the remainder is " << remainder;
+    }
+    return remainder == 0;
+  }
+  ...
+};
+}}}
+
+Then, `EXPECT_THAT(x, DivisibleBy7());` may general a message like this:
+{{{
+Value of: x
+Expected: is divisible by 7
+  Actual: 23 (the remainder is 2)
 }}}
 
 ==  Writing New Polymorphic Matchers ==
 
-You've learned how to write your own matchers here. Just one problem:
-a matcher created using `MakeMatcher()` only works for one particular
-type of arguments. If you want a _polymorphic_ matcher that works with
-arguments of several types (for instance, `Eq(x)` can be used to match
-a `value` as long as `value` == `x` compiles -- `value` and `x` don't
-have to share the same type), you can learn the trick from
-`<gmock/gmock-matchers.h>` but it's a bit involved.
+You've learned how to write your own matchers in the previous
+recipe. Just one problem: a matcher created using `MakeMatcher()` only
+works for one particular type of arguments. If you want a
+_polymorphic_ matcher that works with arguments of several types (for
+instance, `Eq(x)` can be used to match a `value` as long as `value` ==
+`x` compiles -- `value` and `x` don't have to share the same type),
+you can learn the trick from `<gmock/gmock-matchers.h>` but it's a bit
+involved.
 
 Fortunately, most of the time you can define a polymorphic matcher
 easily with the help of `MakePolymorphicMatcher()`. Here's how you can
@@ -2634,20 +2702,15 @@ define `NotNull()` as an example:
 
 {{{
 using ::testing::MakePolymorphicMatcher;
+using ::testing::MatchResultListener;
 using ::testing::NotNull;
 using ::testing::PolymorphicMatcher;
 
 class NotNullMatcher {
  public:
-  // To implement a polymorphic matcher, define a COPYABLE class that
-  // has three members Matches(), DescribeTo(), and DescribeNegationTo()
-  // like the following.  Typically, Matches() is a template or overloaded
-  // such that it accepts values of different types.
-
-  // In this example, we want to use NotNull() with any pointer, so
-  // Matches() accepts a pointer of any type.
-  template <typename T>
-   bool Matches(T* p) const { return p != NULL; }
+  // To implement a polymorphic matcher, first define a COPYABLE class
+  // that has two members DescribeTo() and DescribeNegationTo(),
+  // like the following.
 
   // Describes the property of a value matching this matcher.
   void DescribeTo(::std::ostream* os) const { *os << "is not NULL"; }
@@ -2655,6 +2718,15 @@ class NotNullMatcher {
   // Describes the property of a value NOT matching this matcher.
   void DescribeNegationTo(::std::ostream* os) const { *os << "is NULL"; }
 };
+
+// Then, define a free function MatchAndExplain() in the same namespace.
+// In this example, we want to use NotNull() with any pointer, so
+// MatchAndExpalin() accepts a pointer of any type as its second argument.
+template <typename T>
+bool MatchAndExplain(const NotNullMatcher& impl, T p,
+                     MatchResultListener* listener) const {
+  return p != NULL;
+} 
 
 // To construct a polymorphic matcher, pass an instance of the class
 // to MakePolymorphicMatcher().  Note the return type.
@@ -2670,106 +2742,9 @@ inline PolymorphicMatcher<NotNullMatcher> NotNull() {
 `MatcherInterface` or any other class, and its methods do *not* need
 to be virtual.
 
-==  Writing a Matcher that Generates Informative Messages ==
-
-When a mock function argument fails to match an expectation, Google
-Mock will print the matcher description and the argument, for example:
-
-{{{
-using ::testing::_;
-using ::testing::Gt;
-using ::testing::Le;
-...
-  EXPECT_CALL(mock_foo, Bar(_, Le(1), Gt(5)));
-...
-  mock_foo.Bar(true, 0, 3);
-}}}
-
-will lead to message
-
-{{{
-...
-  Expected arg #2: is greater than 5
-           Actual: 3
-}}}
-
-While this is often enough for a user to investigate the problem,
-sometimes you wish the message tells you more. Example? Suppose you
-are writing a `LongStrEq()` matcher that matches _long, possibly
-multi-line_ strings. It surely helps to pin-point the exact difference
-between the expected and the actual string, e.g. we want
-
-{{{
-  EXPECT_CALL(mock_foo, DoThis(LongStrEq("a long, long string")));
-...
-  mock_foo.DoThis("another long, long string");
-}}}
-
-to generate message
-
-{{{
-...
-  Expected arg #0: a long, long string
-           Actual: another long, long string
-                   (an extra line found after line 10)
-}}}
-
-You can make your matcher generate such messages. How you do it
-depends on whether the matcher is polymorphic or not. For a
-monomorphic matcher (one you create with `MakeMatcher()`), you need to
-override the `ExplainMatchResultTo()` method in `MatcherInterface`:
-
-{{{
-// gmock-matchers.h
-
-template <typename T>
-class MatcherInterface {
- public:
-  ...
-
-  // Explains why x matches, or doesn't match, the matcher.  Override
-  // this to provide any additional information that helps a user
-  // understand the match result.
-  virtual void ExplainMatchResultTo(T x, ::std::ostream* os) const {}
-};
-
-// long_str_eq.h
-
-class LongStrEqMatcher : public MatcherInterface<const char*> {
- public:
-  // ... constructors, Matches(), DescribeTo(), DescribeNegationTo(),
-  // and etc, as usual ...
-
-  // Explains why str matches, OR does not match, this matcher.
-  virtual void ExplainMatchResultTo(const char* str,
-                                    ::std::ostream* os) const { ... }
-};
-}}}
-
-If you define the matcher as a polymorphic one, you need to define
-`ExplainMatchResultTo()` as a *free* function (as opposed to a member
-function) in the *same name space* where the matcher is defined:
-
-{{{
-class LongStrEqPolymorphicMatcher {
- public:
-  // ... constructors, Matches(), DescribeTo(), DescribeNegationTo(),
-  // and etc, as usual ...
-};
-
-// Explains why str matches, OR does not match, this matcher.
-template <typename Str>
-void ExplainMatchResultTo(const LongStrEqPolymorphicMatcher& matcher,
-                          const Str& str, ::std::ostream* os) { ... }
-
-}}}
-
-You should let `ExplainMatchResultTo()` print _any additional
-information_ that can help a user understand the match result. Note
-that it should explain why the match succeeds in case of a success -
-this is useful when the matcher is used inside `Not()`. There is no
-need to print the argument value itself in `ExplainMatchResultTo()`,
-as Google Mock already prints it elsewhere.
+Like in a monomorphic matcher, you may explain the match result by
+streaming additional information to the `listener` argument in
+`MatchAndExplain()`.
 
 ==  Writing New Cardinalities ==
 
