@@ -2724,7 +2724,7 @@ class NotNullMatcher {
 // MatchAndExpalin() accepts a pointer of any type as its second argument.
 template <typename T>
 bool MatchAndExplain(const NotNullMatcher& impl, T p,
-                     MatchResultListener* listener) const {
+                     MatchResultListener* listener) {
   return p != NULL;
 } 
 
