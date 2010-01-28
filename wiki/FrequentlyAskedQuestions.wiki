@@ -8,6 +8,199 @@ Please send your questions to the
 group. If you need help with compiler errors, make sure you have
 tried [#How_am_I_supposed_to_make_sense_of_these_horrible_template_error Google Mock Doctor] first.
 
+== I wrote some matchers.  After I upgraded to a new version of Google Mock, they no longer compile.  What's going on? ==
+
+After version 1.4.0 of Google Mock was released, we had an idea on how
+to make it easier to write matchers that can generate informative
+messages efficiently.  We experimented with this idea and liked what
+we saw.  Therefore we decided to implement it.
+
+Unfortunately, this means that if you have defined your own matchers
+by implementing `MatcherInterface` or using `MakePolymorphicMatcher()`,
+your definitions will no longer compile.  Matchers defined using the
+`MATCHER*` family of macros are not affected.
+
+Sorry for the hassle if your matchers are affected.  We believe it's
+in everyone's long-term interest to make this change sooner than
+later.  Fortunately, it's usually not hard to migrate an existing
+matcher to the new API.  Here's what you need to do:
+
+If you wrote your matcher like this:
+{{{
+// Old matcher definition that doesn't work with the latest
+// Google Mock.
+using ::testing::MatcherInterface;
+...
+class MyWonderfulMatcher : public MatcherInterface<MyType> {
+ public:
+  ...
+  virtual bool Matches(MyType value) const {
+    // Returns true if value matches.
+    return value.GetFoo() > 5;
+  }
+  ...
+};
+}}}
+
+you'll need to change it to:
+{{{
+// New matcher definition that works with the latest Google Mock.
+using ::testing::MatcherInterface;
+using ::testing::MatchResultListener;
+...
+class MyWonderfulMatcher : public MatcherInterface<MyType> {
+ public:
+  ...
+  virtual bool MatchAndExplain(MyType value,
+                               MatchResultListener* listener) const {
+    // Returns true if value matches.
+    return value.GetFoo() > 5;
+  }
+  ...
+};
+}}}
+(i.e. rename `Matches()` to `MatchAndExplain()` and give it a second
+argument of type `MatchResultListener*`.)
+
+If you were also using `ExplainMatchResultTo()` to improve the matcher
+message:
+{{{
+// Old matcher definition that doesn't work with the lastest
+// Google Mock.
+using ::testing::MatcherInterface;
+...
+class MyWonderfulMatcher : public MatcherInterface<MyType> {
+ public:
+  ...
+  virtual bool Matches(MyType value) const {
+    // Returns true if value matches.
+    return value.GetFoo() > 5;
+  }
+
+  virtual void ExplainMatchResultTo(MyType value,
+                                    ::std::ostream* os) const {
+    // Prints some helpful information to os to help
+    // a user understand why value matches (or doesn't match).
+    *os << "the Foo property is " << value.GetFoo();
+  }
+  ...
+};
+}}}
+
+you should move the logic of `ExplainMatchResultTo()` into
+`MatchAndExplain()`, using the `MatchResultListener` argument where
+the `::std::ostream` was used:
+{{{
+// New matcher definition that works with the latest Google Mock.
+using ::testing::MatcherInterface;
+using ::testing::MatchResultListener;
+...
+class MyWonderfulMatcher : public MatcherInterface<MyType> {
+ public:
+  ...
+  virtual bool MatchAndExplain(MyType value,
+                               MatchResultListener* listener) const {
+    // Returns true if value matches.
+    *listener << "the Foo property is " << value.GetFoo();
+    return value.GetFoo() > 5;
+  }
+  ...
+};
+}}}
+
+If your matcher is defined using `MakePolymorphicMatcher()`:
+{{{
+// Old matcher definition that doesn't work with the latest
+// Google Mock.
+using ::testing::MakePolymorphicMatcher;
+...
+class MyGreatMatcher {
+ public:
+  ...
+  bool Matches(MyType value) const {
+    // Returns true if value matches.
+    return value.GetBar() < 42;
+  }
+  ...
+};
+... MakePolymorphicMatcher(MyGreatMatcher()) ...
+}}}
+
+you should rename the `Matches()` method to `MatchAndExplain()` and
+add a `MatchResultListener*` argument (the same as what you need to do
+for matchers defined by implementing `MatcherInterface`):
+{{{
+// New matcher definition that works with the latest Google Mock.
+using ::testing::MakePolymorphicMatcher;
+using ::testing::MatchResultListener;
+...
+class MyGreatMatcher {
+ public:
+  ...
+  bool MatchAndExplain(MyType value,
+                       MatchResultListener* listener) const {
+    // Returns true if value matches.
+    return value.GetBar() < 42;
+  }
+  ...
+};
+... MakePolymorphicMatcher(MyGreatMatcher()) ...
+}}}
+
+If your polymorphic matcher uses `ExplainMatchResultTo()` for better
+failure messages:
+{{{
+// Old matcher definition that doesn't work with the latest
+// Google Mock.
+using ::testing::MakePolymorphicMatcher;
+...
+class MyGreatMatcher {
+ public:
+  ...
+  bool Matches(MyType value) const {
+    // Returns true if value matches.
+    return value.GetBar() < 42;
+  }
+  ...
+};
+void ExplainMatchResultTo(const MyGreatMatcher& matcher,
+                          MyType value,
+                          ::std::ostream* os) {
+  // Prints some helpful information to os to help
+  // a user understand why value matches (or doesn't match).
+  *os << "the Bar property is " << value.GetBar();
+}
+... MakePolymorphicMatcher(MyGreatMatcher()) ...
+}}}
+
+you'll need to move the logic inside `ExplainMatchResultTo()` to
+`MatchAndExplain()`:
+{{{
+// New matcher definition that works with the latest Google Mock.
+using ::testing::MakePolymorphicMatcher;
+using ::testing::MatchResultListener;
+...
+class MyGreatMatcher {
+ public:
+  ...
+  bool MatchAndExplain(MyType value,
+                       MatchResultListener* listener) const {
+    // Returns true if value matches.
+    *listener << "the Bar property is " << value.GetBar();
+    return value.GetBar() < 42;
+  }
+  ...
+};
+... MakePolymorphicMatcher(MyGreatMatcher()) ...
+}}}
+
+For more information, you can read these
+[http://code.google.com/p/googlemock/wiki/CookBook#Writing_New_Monomorphic_Matchers two]
+[http://code.google.com/p/googlemock/wiki/CookBook#Writing_New_Polymorphic_Matchers recipes]
+from the cookbook.  As always, you
+are welcome to post questions on `googlemock@googlegroups.com` if you
+need any help.
+
 == When using Google Mock, do I have to use Google Test as the testing framework?  I have my favorite testing framework and don't want to switch. ==
 
 Google Mock works out of the box with Google Test.  However, it's easy
