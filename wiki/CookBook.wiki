@@ -2709,8 +2709,18 @@ using ::testing::PolymorphicMatcher;
 class NotNullMatcher {
  public:
   // To implement a polymorphic matcher, first define a COPYABLE class
-  // that has two members DescribeTo() and DescribeNegationTo(),
-  // like the following.
+  // that has three members MatchAndExplain(), DescribeTo(), and
+  // DescribeNegationTo(), like the following.
+
+  // In this example, we want to use NotNull() with any pointer, so
+  // MatchAndExplain() accepts a pointer of any type as its first argument.
+  // In general, you can define MatchAndExplain() as an ordinary method or
+  // a method template, or even overload it.
+  template <typename T>
+  bool MatchAndExplain(T* p,
+                       MatchResultListener* /* listener */) const {
+    return p != NULL;
+  }
 
   // Describes the property of a value matching this matcher.
   void DescribeTo(::std::ostream* os) const { *os << "is not NULL"; }
@@ -2718,15 +2728,6 @@ class NotNullMatcher {
   // Describes the property of a value NOT matching this matcher.
   void DescribeNegationTo(::std::ostream* os) const { *os << "is NULL"; }
 };
-
-// Then, define a free function MatchAndExplain() in the same namespace.
-// In this example, we want to use NotNull() with any pointer, so
-// MatchAndExpalin() accepts a pointer of any type as its second argument.
-template <typename T>
-bool MatchAndExplain(const NotNullMatcher& impl, T p,
-                     MatchResultListener* listener) {
-  return p != NULL;
-} 
 
 // To construct a polymorphic matcher, pass an instance of the class
 // to MakePolymorphicMatcher().  Note the return type.
