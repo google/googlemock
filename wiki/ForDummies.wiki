@@ -15,7 +15,7 @@ When you write a prototype or test, often it's not feasible or wise to rely on r
 
 If all this seems too abstract for you, don't worry - the most important thing to remember is that a mock allows you to check the _interaction_ between itself and code that uses it. The difference between fakes and mocks will become much clearer once you start to use mocks.
 
-*Google C++ Mocking Framework* (or *Google Mock* for short) is a library (sometimes we also call it a "framework" to make it sound cool) for creating mock classes and using them. It does to C++ what [http://www.jmock.org/ jMock] and [http://www.easymock.org/ EasyMock] do to Java.  Google Mock currently works with [http://code.google.com/p/googletest/ Google C++ Testing Framework].  We hope to make it work with other testing frameworks as well in the future.
+*Google C++ Mocking Framework* (or *Google Mock* for short) is a library (sometimes we also call it a "framework" to make it sound cool) for creating mock classes and using them. It does to C++ what [http://www.jmock.org/ jMock] and [http://www.easymock.org/ EasyMock] do to Java.
 
 Using Google Mock involves three basic steps:
  
@@ -184,7 +184,21 @@ int main(int argc, char** argv) {
 }
 }}}
 
-Or, you can use Google Test's [http://code.google.com/p/googletest/wiki/GoogleTestAdvancedGuide#Extending_Google_Test_by_Handling_Test_Events event listener API] to customize how you want Google Mock failures to be handled.
+This approach has a catch: it makes Google Mock throw an exception
+from a mock object's destructor sometimes.  With some compilers, this
+sometimes causes the test program to crash.  You'll still be able to
+notice that the test has failed, but it's not a graceful failure.
+
+A better solution is to use Google Test's
+[http://code.google.com/p/googletest/wiki/GoogleTestAdvancedGuide#Extending_Google_Test_by_Handling_Test_Events event listener API]
+to report a test failure to your testing framework properly.  You'll need to
+implement the `OnTestPartResult()` method of the event listener interface, but it
+should be straightforward.
+
+If this turns out to be too much work, we suggest that you stick with
+Google Test, which works with Google Mock seamlessly (in fact, it is
+technically part of Google Mock.).  If there is a reason that you
+cannot use Google Test, please let us know.
 
 =  Setting Expectations =
 The key to using a mock object successfully is to set the _right expectations_ on it. If you set the expectations too strict, your test will fail as the result of unrelated changes. If you set them too loose, bugs can slip through. You want to do it just right such that your test can catch exactly the kind of bugs you intend it to catch. Google Mock provides the necessary means for you to do it "just right."
