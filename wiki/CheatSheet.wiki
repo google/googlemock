@@ -283,6 +283,7 @@ You can make a matcher from one or more other matchers:
 == Matchers as Predicates ==
 
 ||`Matches(m)`||a unary functor that returns `true` if the argument matches `m`.||
+||`MatchAndExplain(m, value, result_listener)`||returns `true` if `value` matches `m`, explaining the result to `result_listener`.||
 ||`Value(x, m)`||returns `true` if the value of `x` matches `m`.||
 
 == Defining Matchers ==
