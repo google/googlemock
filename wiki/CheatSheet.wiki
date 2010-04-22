@@ -223,6 +223,7 @@ container exactly.   If you want to write the elements in-line,
 match them more flexibly, or get more informative messages, you can use:
 
 || `Contains(e)` || `argument` contains an element that matches `e`, which can be either a value or a matcher. ||
+|| `Each(e)` || `argument` is a container where _every_ element matches `e`, which can be either a value or a matcher. ||
 ||`ElementsAre(e0, e1, ..., en)`||`argument` has `n + 1` elements, where the i-th element matches `ei`, which can be a value or a matcher. 0 to 10 arguments are allowed.||
 ||`ElementsAreArray(array)` or `ElementsAreArray(array, count)`||The same as `ElementsAre()` except that the expected element values/matchers come from a C-style array.||
 || `ContainerEq(container)` || The same as `Eq(container)` except that the failure message also includes which elements are in one container but not the other. ||
