@@ -2244,11 +2244,11 @@ And that's that.
 
 ==  Using Google Mock and Threads ==
 
-*IMPORTANT NOTE:* What we describe in this recipe is *NOT* true yet,
-as Google Mock is not currently thread-safe.  However, all we need to
-make it thread-safe is to implement some synchronization operations in
-`<gtest/internal/gtest-port.h>` - and then the information below will
-become true.
+*IMPORTANT NOTE:* What we describe in this recipe is *ONLY* true on
+platforms where Google Mock is thread-safe. Currently these are only
+platforms that support the pthreads library (this includes Linux and Mac).
+To make it thread-safe on other platforms we only need to implement
+some synchronization operations in `<gtest/internal/gtest-port.h>`.
 
 In a *unit* test, it's best if you could isolate and test a piece of
 code in a single-threaded context. That avoids race conditions and
