@@ -224,9 +224,10 @@ match them more flexibly, or get more informative messages, you can use:
 
 || `Contains(e)` || `argument` contains an element that matches `e`, which can be either a value or a matcher. ||
 || `Each(e)` || `argument` is a container where _every_ element matches `e`, which can be either a value or a matcher. ||
-||`ElementsAre(e0, e1, ..., en)`||`argument` has `n + 1` elements, where the i-th element matches `ei`, which can be a value or a matcher. 0 to 10 arguments are allowed.||
-||`ElementsAreArray(array)` or `ElementsAreArray(array, count)`||The same as `ElementsAre()` except that the expected element values/matchers come from a C-style array.||
+|| `ElementsAre(e0, e1, ..., en)` || `argument` has `n + 1` elements, where the i-th element matches `ei`, which can be a value or a matcher. 0 to 10 arguments are allowed. ||
+|| `ElementsAreArray(array)` or `ElementsAreArray(array, count)` || The same as `ElementsAre()` except that the expected element values/matchers come from a C-style array. ||
 || `ContainerEq(container)` || The same as `Eq(container)` except that the failure message also includes which elements are in one container but not the other. ||
+|| `Pointwise(m, container)` || `argument` contains the same number of elements as in `container`, and for all i, (the i-th element in `argument`, the i-th element in `container`) match `m`, which is a matcher on 2-tuples. E.g. `Pointwise(Le(), upper_bounds)` verifies that each element in `argument` doesn't exceed the corresponding element in `upper_bounds`. ||
 
 These matchers can also match:
 
