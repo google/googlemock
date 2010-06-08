@@ -2387,7 +2387,7 @@ The `MATCHER*` family of macros can be used to define custom matchers
 easily.  The syntax:
 
 {{{
-MATCHER(name, "description string") { statements; }
+MATCHER(name, description_string_expression) { statements; }
 }}}
 
 will define a matcher with the given name that executes the
@@ -2395,13 +2395,16 @@ statements, which must return a `bool` to indicate if the match
 succeeds.  Inside the statements, you can refer to the value being
 matched by `arg`, and refer to its type by `arg_type`.
 
-The description string documents what the matcher does, and is used to
-generate the failure message when the match fails.  Since a
-`MATCHER()` is usually defined in a header file shared by multiple C++
-source files, we require the description to be a C-string _literal_ to
-avoid possible side effects.  It can be empty (`""`), in which case
-Google Mock will use the sequence of words in the matcher name as the
-description.
+The description string is a `string`-typed expression that documents
+what the matcher does, and is used to generate the failure message
+when the match fails.  It can (and should) reference the special
+`bool` variable `negation`, and should evaluate to the description of
+the matcher when `negation` is `false`, or that of the matcher's
+negation when `negation` is `true`.
+
+For convenience, we allow the description string to be empty (`""`),
+in which case Google Mock will use the sequence of words in the
+matcher name as the description.
 
 For example:
 {{{
@@ -2414,17 +2417,34 @@ allows you to write
 }}}
 or,
 {{{
-  // Verifies that the value of some_expression is divisible by 7.
+using ::testing::Not;
+...
   EXPECT_THAT(some_expression, IsDivisibleBy7());
+  EXPECT_THAT(some_other_expression, Not(IsDivisibleBy7()));
 }}}
-If the above assertion fails, it will print something like:
+If the above assertions fail, they will print something like:
 {{{
   Value of: some_expression
   Expected: is divisible by 7
     Actual: 27
+...
+  Value of: some_other_expression
+  Expected: not (is divisible by 7)
+    Actual: 21
 }}}
-where the description `"is divisible by 7"` is automatically calculated from the
-matcher name `IsDivisibleBy7`.
+where the descriptions `"is divisible by 7"` and `"not (is divisible
+by 7)"` are automatically calculated from the matcher name
+`IsDivisibleBy7`.
+
+As you may have noticed, the auto-generated descriptions (especially
+those for the negation) may not be so great. You can always override
+them with a string expression of your own:
+{{{
+MATCHER(IsDivisibleBy7, std::string(negation ? "isn't" : "is") +
+                        " divisible by 7") {
+  return (arg % 7) == 0;
+}
+}}}
 
 Optionally, you can stream additional information to a hidden argument
 named `result_listener` to explain the match result. For example, a
@@ -2463,8 +2483,10 @@ Google Mock already prints it for you.
 Sometimes you'll want to define a matcher that has parameters.  For that you
 can use the macro:
 {{{
-MATCHER_P(name, param_name, "description string") { statements; }
+MATCHER_P(name, param_name, description_string) { statements; }
 }}}
+where the description string can be either `""` or a string expression
+that references `negation` and `param_name`.
 
 For example:
 {{{
@@ -2492,23 +2514,22 @@ body of `MATCHER_P(HasAbsoluteValue, value)` above, you can write
 Google Mock also provides `MATCHER_P2`, `MATCHER_P3`, ..., up to
 `MATCHER_P10` to support multi-parameter matchers:
 {{{
-MATCHER_Pk(name, param_1, ..., param_k, "description string") { statements; }
+MATCHER_Pk(name, param_1, ..., param_k, description_string) { statements; }
 }}}
 
 Please note that the custom description string is for a particular
 *instance* of the matcher, where the parameters have been bound to
 actual values.  Therefore usually you'll want the parameter values to
-be part of the description.  Google Mock lets you do that using
-Python-style interpolations.  The following syntaxes are supported
-currently:
-
-|| `%%` || a single `%` character ||
-|| `%(*)s` || all parameters of the matcher printed as a tuple ||
-|| `%(foo)s` || value of the matcher parameter named `foo` ||
+be part of the description.  Google Mock lets you do that by
+referencing the matcher parameters in the description string
+expression.
 
 For example,
 {{{
-  MATCHER_P2(InClosedRange, low, hi, "is in range [%(low)s, %(hi)s]") {
+  using ::testing::PrintToString;
+  MATCHER_P2(InClosedRange, low, hi,
+             std::string(negation ? "isn't" : "is") + " in range [" +
+             PrintToString?(low) + ", " + PrintToString?(hi) + "]") {
     return low <= arg && arg <= hi;
   }
   ...
@@ -2534,7 +2555,7 @@ would generate a failure that contains the text:
 
 For the purpose of typing, you can view
 {{{
-MATCHER_Pk(Foo, p1, ..., pk, "description string") { ... }
+MATCHER_Pk(Foo, p1, ..., pk, description_string) { ... }
 }}}
 as shorthand for
 {{{
@@ -2567,8 +2588,8 @@ address.
 
 You can overload matchers with different numbers of parameters:
 {{{
-MATCHER_P(Blah, a, "description string 1") { ... }
-MATCHER_P2(Blah, a, b, "description string 2") { ... }
+MATCHER_P(Blah, a, description_string_1) { ... }
+MATCHER_P2(Blah, a, b, description_string_2) { ... }
 }}}
 
 While it's tempting to always use the `MATCHER*` macros when defining
