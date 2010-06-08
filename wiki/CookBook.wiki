@@ -2529,7 +2529,7 @@ For example,
   using ::testing::PrintToString;
   MATCHER_P2(InClosedRange, low, hi,
              std::string(negation ? "isn't" : "is") + " in range [" +
-             PrintToString?(low) + ", " + PrintToString?(hi) + "]") {
+             PrintToString(low) + ", " + PrintToString(hi) + "]") {
     return low <= arg && arg <= hi;
   }
   ...
