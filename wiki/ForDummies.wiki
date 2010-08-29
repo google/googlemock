@@ -190,7 +190,7 @@ sometimes causes the test program to crash.  You'll still be able to
 notice that the test has failed, but it's not a graceful failure.
 
 A better solution is to use Google Test's
-[http://code.google.com/p/googletest/wiki/GoogleTestAdvancedGuide#Extending_Google_Test_by_Handling_Test_Events event listener API]
+[http://code.google.com/p/googletest/wiki/AdvancedGuide#Extending_Google_Test_by_Handling_Test_Events event listener API]
 to report a test failure to your testing framework properly.  You'll need to
 implement the `OnTestPartResult()` method of the event listener interface, but it
 should be straightforward.
