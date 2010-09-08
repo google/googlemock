@@ -1434,6 +1434,69 @@ class MockFoo : public Foo {
       .WillOnce(ReturnRef(bar));
 }}}
 
+== Returning Live Values from Mock Methods ==
+
+The `Return(x)` action saves a copy of `x` when the action is
+_created_, and always returns the same value whenever it's
+executed. Sometimes you may want to instead return the _live_ value of
+`x` (i.e. its value at the time when the action is _executed_.).
+
+If the mock function's return type is a reference, you can do it using
+`ReturnRef(x)`, as shown in the previous recipe ("Returning References
+from Mock Methods"). However, Google Mock doesn't let you use
+`ReturnRef()` in a mock function whose return type is not a reference,
+as doing that usually indicates a user error. So, what shall you do?
+
+You may be tempted to try `ByRef()`:
+
+{{{
+using testing::ByRef;
+using testing::Return;
+
+class MockFoo : public Foo {
+ public:
+  MOCK_METHOD0(GetValue, int());
+};
+...
+  int x = 0;
+  MockFoo foo;
+  EXPECT_CALL(foo, GetValue())
+      .WillRepeatedly(Return(ByRef(x)));
+  x = 42;
+  EXPECT_EQ(42, foo.GetValue());
+}}}
+
+Unfortunately, it doesn't work here. The above code will fail with error:
+
+{{{
+Value of: foo.GetValue()
+  Actual: 0
+Expected: 42
+}}}
+
+The reason is that `Return(value)` converts `value` to the actual
+return type of the mock function at the time when the action is
+_created_, not when it is _executed_. (This behavior was chosen for
+the action to be safe when `value` is a proxy object that references
+some temporary objects.) As a result, `ByRef(x)` is converted to an
+`int` value (instead of a `const int&`) when the expectation is set,
+and `Return(ByRef(x))` will always return 0.
+
+`ReturnPointee(pointer)` was provided to solve this problem
+specifically. It returns the value pointed to by `pointer` at the time
+the action is _executed_:
+
+{{{
+using testing::ReturnPointee;
+...
+  int x = 0;
+  MockFoo foo;
+  EXPECT_CALL(foo, GetValue())
+      .WillRepeatedly(ReturnPointee(&x));  // Note the & here.
+  x = 42;
+  EXPECT_EQ(42, foo.GetValue());  // This will succeed now.
+}}}
+
 ==  Combining Actions ==
 
 Want to do more than one thing when a function is called? That's
