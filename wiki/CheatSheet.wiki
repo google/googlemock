@@ -253,9 +253,9 @@ where the array may be multi-dimensional (i.e. its elements can be arrays).
 
 == Multiargument Matchers ==
 
-These are matchers on tuple types. They can be used in
-`.With()`. The following can be used on functions with <i>two
-arguments</i> `x` and `y`:
+Technically, all matchers match a _single_ value. A "multi-argument"
+matcher is just one that matches a _tuple_. The following matchers can
+be used to match a tuple `(x, y)`:
 
 ||`Eq()`||`x == y`||
 ||`Ge()`||`x >= y`||
@@ -268,7 +268,7 @@ You can use the following selectors to pick a subset of the arguments
 (or reorder them) to participate in the matching:
 
 ||`AllArgs(m)`||Equivalent to `m`. Useful as syntactic sugar in `.With(AllArgs(m))`.||
-||`Args<N1, N2, ..., Nk>(m)`||The `k` selected (using 0-based indices) arguments match `m`, e.g. `Args<1, 2>(Contains(5))`.||
+||`Args<N1, N2, ..., Nk>(m)`||The tuple of the `k` selected (using 0-based indices) arguments matches `m`, e.g. `Args<1, 2>(Eq())`.||
 
 == Composite Matchers ==
 
