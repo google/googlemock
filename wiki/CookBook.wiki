@@ -857,7 +857,7 @@ two forms are equivalent, but `.With(AllArgs(Lt()))` is more readable
 than `.With(Lt())`.
 
 You can use `Args<k1, ..., kn>(m)` to match the `n` selected arguments
-against `m`. For example,
+(as a tuple) against `m`. For example,
 
 {{{
 using ::testing::_;
@@ -875,6 +875,11 @@ says that `Blah()` will be called with arguments `x`, `y`, and `z` where
 As a convenience and example, Google Mock provides some matchers for
 2-tuples, including the `Lt()` matcher above. See the CheatSheet for
 the complete list.
+
+Note that if you want to pass the arguments to a predicate of your own
+(e.g. `.With(Args<0, 1>(Truly(&MyPredicate)))`), that predicate MUST be
+written to take a `tr1::tuple` as its argument; gMock will pass the `n`
+selected arguments as _one_ single tuple to the predicate.
 
 ==  Using Matchers as Predicates ==
 
