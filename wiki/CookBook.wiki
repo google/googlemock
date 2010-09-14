@@ -927,7 +927,7 @@ called `ASSERT_THAT` and `EXPECT_THAT`:
 For example, in a Google Test test you can write:
 
 {{{
-#include <gmock/gmock.h>
+#include "gmock/gmock.h"
 
 using ::testing::AllOf;
 using ::testing::Ge;
@@ -2316,7 +2316,7 @@ And that's that.
 platforms where Google Mock is thread-safe. Currently these are only
 platforms that support the pthreads library (this includes Linux and Mac).
 To make it thread-safe on other platforms we only need to implement
-some synchronization operations in `<gtest/internal/gtest-port.h>`.
+some synchronization operations in `"gtest/internal/gtest-port.h"`.
 
 In a *unit* test, it's best if you could isolate and test a piece of
 code in a single-threaded context. That avoids race conditions and
@@ -2783,7 +2783,7 @@ works for one particular type of arguments. If you want a
 _polymorphic_ matcher that works with arguments of several types (for
 instance, `Eq(x)` can be used to match a `value` as long as `value` ==
 `x` compiles -- `value` and `x` don't have to share the same type),
-you can learn the trick from `<gmock/gmock-matchers.h>` but it's a bit
+you can learn the trick from `"gmock/gmock-matchers.h"` but it's a bit
 involved.
 
 Fortunately, most of the time you can define a polymorphic matcher
@@ -3267,7 +3267,7 @@ When an uninteresting or unexpected call occurs, Google Mock prints
 the argument values to help you debug.  The `EXPECT_THAT` and
 `ASSERT_THAT` assertions also print the value being validated when the
 test fails.  Google Mock does this using the user-extensible value
-printer defined in `<gmock/gmock-printers.h>`.
+printer defined in `"gtest/gtest-printers.h"`.
 
 This printer knows how to print the built-in C++ types, native arrays,
 STL containers, and any type that supports the `<<` operator. For
