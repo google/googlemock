@@ -1,5 +1,4 @@
 #summary Google C++ Mocking Framework Cheat Sheet
-#labels Featured
 
 <wiki:toc max_depth="3" />
 
