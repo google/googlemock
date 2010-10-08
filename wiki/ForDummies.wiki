@@ -1,5 +1,4 @@
 #summary Google C++ Mocking Framework for Dummies
-#labels Featured
 
 <wiki:toc max_depth="3" />
 
