@@ -1,4 +1,5 @@
 #summary How to contribute to Google C++ Mocking Framework
+#labels Featured
 
 <wiki:toc max_depth="3" />
 
