@@ -194,8 +194,8 @@ class MyGreatMatcher {
 }}}
 
 For more information, you can read these
-[http://code.google.com/p/googlemock/wiki/CookBook#Writing_New_Monomorphic_Matchers two]
-[http://code.google.com/p/googlemock/wiki/CookBook#Writing_New_Polymorphic_Matchers recipes]
+[CookBook#Writing_New_Monomorphic_Matchers two]
+[CookBook#Writing_New_Polymorphic_Matchers recipes]
 from the cookbook.  As always, you
 are welcome to post questions on `googlemock@googlegroups.com` if you
 need any help.
