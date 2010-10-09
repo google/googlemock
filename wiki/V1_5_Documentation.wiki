@@ -1,12 +1,12 @@
 #summary Documentation on Google Mock (the SVN trunk version)
 #labels Featured
 
-This page lists all documentation wiki pages for the version of Google Mock *in the SVN trunk* -- *if you use a released version of Google Mock, please read the documentation for that specific version instead.*
+This page lists all documentation wiki pages for Google Mock *version 1.5.0* -- *if you use a different version of Google Mock, please read the documentation for that specific version instead.*
 
-  * ForDummies -- start here if you are new to Google Mock.
-  * CheatSheet -- a quick reference.
-  * CookBook -- recipes for doing various tasks using Google Mock.
-  * FrequentlyAskedQuestions -- check here before asking a question on the mailing list.
+  * [V1_5_ForDummies ForDummies] -- start here if you are new to Google Mock.
+  * [V1_5_CheatSheet CheatSheet] -- a quick reference.
+  * [V1_5_CookBook CookBook] -- recipes for doing various tasks using Google Mock.
+  * [V1_5_FrequentlyAskedQuestions FrequentlyAskedQuestions] -- check here before asking a question on the mailing list.
 
 To contribute code to Google Mock, read:
 

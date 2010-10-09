@@ -278,7 +278,7 @@ You can make a matcher from one or more other matchers:
 == Adapters for Matchers ==
 
 ||`MatcherCast<T>(m)`||casts matcher `m` to type `Matcher<T>`.||
-||`SafeMatcherCast<T>(m)`|| [CookBook#Casting_Matchers safely casts] matcher `m` to type `Matcher<T>`. ||
+||`SafeMatcherCast<T>(m)`|| [V1_5_CookBook#Casting_Matchers safely casts] matcher `m` to type `Matcher<T>`. ||
 ||`Truly(predicate)`||`predicate(argument)` returns something considered by C++ to be true, where `predicate` is a function or functor.||
 
 == Matchers as Predicates ==
@@ -495,7 +495,7 @@ class MockFunction<R(A1, ..., An)> {
   MOCK_METHODn(Call, R(A1, ..., An));
 };
 }}}
-See this [CookBook#Using_Check_Points recipe] for one application of it.
+See this [V1_5_CookBook#Using_Check_Points recipe] for one application of it.
 
 = Flags =
 
