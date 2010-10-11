@@ -1531,10 +1531,10 @@ modify an output argument. To mock side effects, in general you can
 define your own action by implementing `::testing::ActionInterface`.
 
 If all you need to do is to change an output argument, the built-in
-`SetArgumentPointee()` action is convenient:
+`SetArgPointee()` action is convenient:
 
 {{{
-using ::testing::SetArgumentPointee;
+using ::testing::SetArgPointee;
 
 class MockMutator : public Mutator {
  public:
@@ -1545,25 +1545,25 @@ class MockMutator : public Mutator {
 
   MockMutator mutator;
   EXPECT_CALL(mutator, Mutate(true, _))
-      .WillOnce(SetArgumentPointee<1>(5));
+      .WillOnce(SetArgPointee<1>(5));
 }}}
 
 In this example, when `mutator.Mutate()` is called, we will assign 5
 to the `int` variable pointed to by argument #1
 (0-based).
 
-`SetArgumentPointee()` conveniently makes an internal copy of the
+`SetArgPointee()` conveniently makes an internal copy of the
 value you pass to it, removing the need to keep the value in scope and
 alive. The implication however is that the value must have a copy
 constructor and assignment operator.
 
 If the mock method also needs to return a value as well, you can chain
-`SetArgumentPointee()` with `Return()` using `DoAll()`:
+`SetArgPointee()` with `Return()` using `DoAll()`:
 
 {{{
 using ::testing::_;
 using ::testing::Return;
-using ::testing::SetArgumentPointee;
+using ::testing::SetArgPointee;
 
 class MockMutator : public Mutator {
  public:
@@ -1574,7 +1574,7 @@ class MockMutator : public Mutator {
 
   MockMutator mutator;
   EXPECT_CALL(mutator, MutateInt(_))
-      .WillOnce(DoAll(SetArgumentPointee<0>(5),
+      .WillOnce(DoAll(SetArgPointee<0>(5),
                       Return(true)));
 }}}
 
@@ -2108,7 +2108,7 @@ no matter how many times it has been called), you can assign it to an
 action variable and use that variable repeatedly. For example:
 
 {{{
-  Action<bool(int*)> set_flag = DoAll(SetArgumentPointee<0>(5),
+  Action<bool(int*)> set_flag = DoAll(SetArgPointee<0>(5),
                                       Return(true));
   ... use set_flag in .WillOnce() and .WillRepeatedly() ...
 }}}
@@ -3185,7 +3185,7 @@ The previous recipe showed you how to define your own action. This is
 all good, except that you need to know the type of the function in
 which the action will be used. Sometimes that can be a problem. For
 example, if you want to use the action in functions with _different_
-types (e.g. like `Return()` and `SetArgumentPointee()`).
+types (e.g. like `Return()` and `SetArgPointee()`).
 
 If an action can be used in several types of mock functions, we say
 it's _polymorphic_. The `MakePolymorphicAction()` function template

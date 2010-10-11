@@ -593,9 +593,9 @@ functions the action can be used in, and implementing
 == I'm using the set-argument-pointee action, and the compiler complains about "conflicting return type specified".  What does it mean? ==
 
 You got this error as Google Mock has no idea what value it should return
-when the mock method is called.  `SetArgumentPointee()` says what the
+when the mock method is called.  `SetArgPointee()` says what the
 side effect is, but doesn't say what the return value should be.  You
-need `DoAll()` to chain a `SetArgumentPointee()` with a `Return()`.
+need `DoAll()` to chain a `SetArgPointee()` with a `Return()`.
 
 See this [CookBook#Mocking_Side_Effects recipe] for more details and an example.
 
