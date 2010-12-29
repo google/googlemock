@@ -211,6 +211,9 @@ The `argument` can be either a C string or a C++ string object:
 ||`StrEq(string)`||`argument` is equal to `string`.||
 ||`StrNe(string)`||`argument` is not equal to `string`.||
 
+`ContainsRegex()` and `MatchesRegex()` use the regular expression
+syntax defined
+[http://code.google.com/p/googletest/wiki/AdvancedGuide#Regular_Expression_Syntax here].
 `StrCaseEq()`, `StrCaseNe()`, `StrEq()`, and `StrNe()` work for wide
 strings as well.
 
