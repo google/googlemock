@@ -1,0 +1,15 @@
+#summary Documentation on Google Mock 1.6
+#labels Featured
+
+This page lists all documentation wiki pages for Google Mock *1.6*
+- *if you use a released version of Google Mock, please read the documentation for that specific version instead.*
+
+  * [V1_6_ForDummies ForDummies] -- start here if you are new to Google Mock.
+  * [V1_6_CheatSheet CheatSheet] -- a quick reference.
+  * [V1_6_CookBook CookBook] -- recipes for doing various tasks using Google Mock.
+  * [V1_6_FrequentlyAskedQuestions FrequentlyAskedQuestions] -- check here before asking a question on the mailing list.
+
+To contribute code to Google Mock, read:
+
+  * [DevGuide DevGuide] -- read this _before_ writing your first patch.
+  * [http://code.google.com/p/googletest/wiki/V1_6_PumpManual Pump Manual] -- how we generate some of Google Mock's source files.
