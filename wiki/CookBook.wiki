@@ -1311,7 +1311,7 @@ instead of being overly constraining.
 
 Google Mock allows you to impose an arbitrary DAG (directed acyclic
 graph) on the calls. One way to express the DAG is to use the
-[CheatSheet#The_After_Clause After] clause of `EXPECT_CALL`.
+[http://code.google.com/p/googlemock/wiki/CheatSheet#The_After_Clause After] clause of `EXPECT_CALL`.
 
 Another way is via the `InSequence()` clause (not the same as the
 `InSequence` class), which we borrowed from jMock 2. It's less

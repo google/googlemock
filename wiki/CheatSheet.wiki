@@ -283,7 +283,7 @@ You can make a matcher from one or more other matchers:
 == Adapters for Matchers ==
 
 ||`MatcherCast<T>(m)`||casts matcher `m` to type `Matcher<T>`.||
-||`SafeMatcherCast<T>(m)`|| [CookBook#Casting_Matchers safely casts] matcher `m` to type `Matcher<T>`. ||
+||`SafeMatcherCast<T>(m)`|| [http://code.google.com/p/googlemock/wiki/CookBook#Casting_Matchers safely casts] matcher `m` to type `Matcher<T>`. ||
 ||`Truly(predicate)`||`predicate(argument)` returns something considered by C++ to be true, where `predicate` is a function or functor.||
 
 == Matchers as Predicates ==
@@ -306,7 +306,7 @@ You can make a matcher from one or more other matchers:
 
 == Matchers as Test Assertions ==
 
-||`ASSERT_THAT(expression, m)`||Generates a [http://code.google.com/p/googletest/wiki/GoogleTestPrimer#Assertions fatal failure] if the value of `expression` doesn't match matcher `m`.||
+||`ASSERT_THAT(expression, m)`||Generates a [http://code.google.com/p/googletest/wiki/Primer#Assertions fatal failure] if the value of `expression` doesn't match matcher `m`.||
 ||`EXPECT_THAT(expression, m)`||Generates a non-fatal failure if the value of `expression` doesn't match matcher `m`.||
 
 = Actions =
@@ -504,7 +504,7 @@ class MockFunction<R(A1, ..., An)> {
   MOCK_METHODn(Call, R(A1, ..., An));
 };
 }}}
-See this [CookBook#Using_Check_Points recipe] for one application of it.
+See this [http://code.google.com/p/googlemock/wiki/CookBook#Using_Check_Points recipe] for one application of it.
 
 = Flags =
 

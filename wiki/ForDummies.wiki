@@ -2,7 +2,7 @@
 
 <wiki:toc max_depth="3" />
 
-(*Note:* If you get compiler errors that you don't understand, be sure to consult [FrequentlyAskedQuestions#How_am_I_supposed_to_make_sense_of_these_horrible_template_error Google Mock Doctor].)
+(*Note:* If you get compiler errors that you don't understand, be sure to consult [http://code.google.com/p/googlemock/wiki/FrequentlyAskedQuestions#How_am_I_supposed_to_make_sense_of_these_horrible_template_error Google Mock Doctor].)
 
 =  What Is Google C++ Mocking Framework? =
 When you write a prototype or test, often it's not feasible or wise to rely on real objects entirely. A *mock object* implements the same interface as a real object (so it can be used as one), but lets you specify at run time how it will be used and what it should do (which methods will be called? in which order? how many times? with what arguments? what will they return? etc).
@@ -303,7 +303,7 @@ says that `turtle.GetY()` will be called _at least twice_ (Google Mock knows thi
 
 Of course, if you explicitly write a `Times()`, Google Mock will not try to infer the cardinality itself. What if the number you specified is larger than there are `WillOnce()` clauses? Well, after all `WillOnce()`s are used up, Google Mock will do the _default_ action for the function every time (unless, of course, you have a `WillRepeatedly()`.).
 
-What can we do inside `WillOnce()` besides `Return()`? You can return a reference using `ReturnRef(variable)`, or invoke a pre-defined function, among [CheatSheet#Actions others].
+What can we do inside `WillOnce()` besides `Return()`? You can return a reference using `ReturnRef(variable)`, or invoke a pre-defined function, among [http://code.google.com/p/googlemock/wiki/CheatSheet#Actions others].
 
 *Important note:* The `EXPECT_CALL()` statement evaluates the action clause only once, even though the action may be performed many times. Therefore you must be careful about side effects. The following may not do what you want:
 

@@ -1,7 +1,8 @@
 #summary Documentation on Google Mock (the SVN trunk version)
 #labels Featured
 
-This page lists all documentation wiki pages for the version of Google Mock *in the SVN trunk* -- *if you use a released version of Google Mock, please read the documentation for that specific version instead.*
+This page lists all documentation wiki pages for Google Mock *(the SVN trunk version)*
+- *if you use a released version of Google Mock, please read the documentation for that specific version instead.*
 
   * [ForDummies ForDummies] -- start here if you are new to Google Mock.
   * [CheatSheet CheatSheet] -- a quick reference.
@@ -10,5 +11,5 @@ This page lists all documentation wiki pages for the version of Google Mock *in 
 
 To contribute code to Google Mock, read:
 
-  * DevGuide -- read this _before_ writing your first patch.
+  * [DevGuide DevGuide] -- read this _before_ writing your first patch.
   * [http://code.google.com/p/googletest/wiki/PumpManual Pump Manual] -- how we generate some of Google Mock's source files.

@@ -198,8 +198,8 @@ class MyGreatMatcher {
 }}}
 
 For more information, you can read these
-[CookBook#Writing_New_Monomorphic_Matchers two]
-[CookBook#Writing_New_Polymorphic_Matchers recipes]
+[http://code.google.com/p/googlemock/wiki/CookBook#Writing_New_Monomorphic_Matchers two]
+[http://code.google.com/p/googlemock/wiki/CookBook#Writing_New_Polymorphic_Matchers recipes]
 from the cookbook.  As always, you
 are welcome to post questions on `googlemock@googlegroups.com` if you
 need any help.
@@ -208,7 +208,7 @@ need any help.
 
 Google Mock works out of the box with Google Test.  However, it's easy
 to configure it to work with any testing framework of your choice.
-[ForDummies#Using_Google_Mock_with_Any_Testing_Framework Here] is how.
+[http://code.google.com/p/googlemock/wiki/ForDummies#Using_Google_Mock_with_Any_Testing_Framework Here] is how.
 
 == How am I supposed to make sense of these horrible template errors? ==
 
@@ -476,10 +476,10 @@ verbose level.
 If you find yourself needing to perform some action that's not
 supported by Google Mock directly, remember that you can define your own
 actions using
-[CookBook#Writing_New_Actions MakeAction()] or
-[CookBook#Writing_New_Polymorphic_Actions MakePolymorphicAction()],
+[http://code.google.com/p/googlemock/wiki/CookBook#Writing_New_Actions MakeAction()] or
+[http://code.google.com/p/googlemock/wiki/CookBook#Writing_New_Polymorphic_Actions MakePolymorphicAction()],
 or you can write a stub function and invoke it using
-[CookBook#Using_Functions_Methods_Functors Invoke()].
+[http://code.google.com/p/googlemock/wiki/CookBook#Using_Functions_Methods_Functors Invoke()].
 
 == MOCK_METHODn()'s second argument looks funny.  Why don't you use the MOCK_METHODn(Method, return_type, arg_1, ..., arg_n) syntax? =
 
@@ -601,7 +601,7 @@ when the mock method is called.  `SetArgPointee()` says what the
 side effect is, but doesn't say what the return value should be.  You
 need `DoAll()` to chain a `SetArgPointee()` with a `Return()`.
 
-See this [CookBook#Mocking_Side_Effects recipe] for more details and an example.
+See this [http://code.google.com/p/googlemock/wiki/CookBook#Mocking_Side_Effects recipe] for more details and an example.
 
 
 == My question is not in your FAQ! ==
