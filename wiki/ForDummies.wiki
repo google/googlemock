@@ -311,7 +311,7 @@ What can we do inside `WillOnce()` besides `Return()`? You can return a referenc
 int n = 100;
 EXPECT_CALL(turtle, GetX())
 .Times(4)
-.WillOnce(Return(n++));
+.WillRepeatedly(Return(n++));
 }}}
 
 Instead of returning 100, 101, 102, ..., consecutively, this mock function will always return 100 as `n++` is only evaluated once. Similarly, `Return(new Foo)` will create a new `Foo` object when the `EXPECT_CALL()` is executed, and will return the same pointer every time. If you want the side effect to happen every time, you need to define a custom action, which we'll teach in the [CookBook CookBook].
