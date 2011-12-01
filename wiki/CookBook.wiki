@@ -1061,7 +1061,7 @@ Remember that there is `AllOf()`.
 ==  Validating the Value Pointed to by a Pointer Argument ==
 
 C++ functions often take pointers as arguments. You can use matchers
-like `NULL`, `NotNull()`, and other comparison matchers to match a
+like `IsNull()`, `NotNull()`, and other comparison matchers to match a
 pointer, but what if you want to make sure the value _pointed to_ by
 the pointer, instead of the pointer itself, has a certain property?
 Well, you can use the `Pointee(m)` matcher.
