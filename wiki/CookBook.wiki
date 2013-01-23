@@ -2468,7 +2468,69 @@ tests like so:
 
 Now, judiciously use the right flag to enable Google Mock serve you better!
 
-==  Running Tests in Emacs ==
+== Gaining Super Vision into Mock Calls ==
+
+You have a test using Google Mock. It fails: Google Mock tells you
+that some expectations aren't satisfied. However, you aren't sure why:
+Is there a typo somewhere in the matchers? Did you mess up the order
+of the `EXPECT_CALL`s? Or is the code under test doing something
+wrong?  How can you find out the cause?
+
+Won't it be nice if you have X-ray vision and can actually see the
+trace of all `EXPECT_CALL`s and mock method calls as they are made?
+For each call, would you like to see its actual argument values and
+which `EXPECT_CALL` Google Mock thinks it matches?
+
+You can unlock this power by running your test with the
+`--gmock_verbose=info` flag. For example, given the test program:
+
+{{{
+using testing::_;
+using testing::HasSubstr;
+using testing::Return;
+
+class MockFoo {
+ public:
+  MOCK_METHOD2(F, void(const string& x, const string& y));
+};
+
+TEST(Foo, Bar) {
+  MockFoo mock;
+  EXPECT_CALL(mock, F(_, _)).WillRepeatedly(Return());
+  EXPECT_CALL(mock, F("a", "b"));
+  EXPECT_CALL(mock, F("c", HasSubstr("d")));
+
+  mock.F("a", "good");
+  mock.F("a", "b");
+}
+}}}
+
+if you run it with `--gmock_verbose=info`, you will see this output:
+
+{{{
+[ RUN      ] Foo.Bar
+
+foo_test.cc:14: EXPECT_CALL(mock, F(_, _)) invoked
+foo_test.cc:15: EXPECT_CALL(mock, F("a", "b")) invoked
+foo_test.cc:16: EXPECT_CALL(mock, F("c", HasSubstr("d"))) invoked
+foo_test.cc:14: Mock function call matches EXPECT_CALL(mock, F(_, _))...
+    Function call: F(@0x7fff7c8dad40"a", @0x7fff7c8dad10"good")
+foo_test.cc:15: Mock function call matches EXPECT_CALL(mock, F("a", "b"))...
+    Function call: F(@0x7fff7c8dada0"a", @0x7fff7c8dad70"b")
+foo_test.cc:16: Failure
+Actual function call count doesn't match EXPECT_CALL(mock, F("c", HasSubstr("d")))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+[  FAILED  ] Foo.Bar
+}}}
+
+Suppose the bug is that the `"c"` in the third `EXPECT_CALL` is a typo
+and should actually be `"a"`. With the above message, you should see
+that the actual `F("a", "good")` call is matched by the first
+`EXPECT_CALL`, not the third as you thought. From that it should be
+obvious that the third `EXPECT_CALL` is written wrong. Case solved.
+
+== Running Tests in Emacs ==
 
 If you build and run your tests in Emacs, the source file locations of
 Google Mock and [http://code.google.com/p/googletest/ Google Test]
