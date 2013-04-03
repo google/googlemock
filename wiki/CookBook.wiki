@@ -1229,6 +1229,22 @@ matcher variable and use that variable repeatedly! For example,
 
 =  Setting Expectations =
 
+== Knowing When to Expect ==
+
+`ON_CALL` is likely the single most under-utilized construct in Google Mock.
+
+There are basically two constructs for defining the behavior of a mock object: `ON_CALL` and `EXPECT_CALL`. The difference? `ON_CALL` defines what happens when a mock method is called, but _doesn't imply any expectation on the method being called._ `EXPECT_CALL` not only defines the behavior, but also sets an expectation that _the method will be called with the given arguments, for the given number of times_ (and _in the given order_ when you specify the order too).
+
+Since `EXPECT_CALL` does more, isn't it better than `ON_CALL`? Not really. Every `EXPECT_CALL` adds a constraint on the behavior of the code under test. Having more constraints than necessary is _baaad_ - even worse than not having enough constraints.
+
+This may be counter-intuitive. How could tests that verify more be worse than tests that verify less? Isn't verification the whole point of tests?
+
+The answer, lies in _what_ a test should verify. *A good test verifies the contract of the code.* If a test over-specifies, it doesn't leave enough freedom to the implementation. As a result, changing the implementation without breaking the contract (e.g. refactoring and optimization), which should be perfectly fine to do, can break such tests. Then you have to spend time fixing them, only to see them broken again the next time the implementation is changed.
+
+Keep in mind that one doesn't have to verify more than one property in one test. In fact, *it's a good style to verify only one thing in one test.* If you do that, a bug will likely break only one or two tests instead of dozens (which case would you rather debug?). If you are also in the habit of giving tests descriptive names that tell what they verify, you can often easily guess what's wrong just from the test log itself.
+
+So use `ON_CALL` by default, and only use `EXPECT_CALL` when you actually intend to verify that the call is made. For example, you may have a bunch of `ON_CALL`s in your test fixture to set the common mock behavior shared by all tests in the same group, and write (scarcely) different `EXPECT_CALL`s in different `TEST_F`s to verify different aspects of the code's behavior. Compared with the style where each `TEST` has many `EXPECT_CALL`s, this leads to tests that are more resilient to implementational changes (and thus less likely to require maintenance) and makes the intent of the tests more obvious (so they are easier to maintain when you do need to maintain them).
+
 ==  Ignoring Uninteresting Calls ==
 
 If you are not interested in how a mock method is called, just don't
