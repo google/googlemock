@@ -189,13 +189,18 @@ matcher will be changed.
 ||`NanSensitiveDoubleEq(a_double)`||`argument` is a `double` value approximately equal to `a_double`, treating two !NaNs as equal.||
 ||`NanSensitiveFloatEq(a_float)`||`argument` is a `float` value approximately equal to `a_float`, treating two !NaNs as equal.||
 
-These matchers use ULP-based comparison (the same as used in
+The above matchers use ULP-based comparison (the same as used in
 [http://code.google.com/p/googletest/ Google Test]). They
 automatically pick a reasonable error bound based on the absolute
 value of the expected value.  `DoubleEq()` and `FloatEq()` conform to
 the IEEE standard, which requires comparing two !NaNs for equality to
 return false. The `NanSensitive*` version instead treats two !NaNs as
 equal, which is often what a user wants.
+
+||`DoubleNear(a_double, max_abs_error)`||`argument` is a `double` value close to `a_double` (absolute error <= `max_abs_error`), treating two !NaNs as unequal.||
+||`FloatNear(a_float, max_abs_error)`||`argument` is a `float` value close to `a_float` (absolute error <= `max_abs_error`), treating two !NaNs as unequal.||
+||`NanSensitiveDoubleNear(a_double, max_abs_error)`||`argument` is a `double` value close to `a_double` (absolute error <= `max_abs_error`), treating two !NaNs as equal.||
+||`NanSensitiveFloatNear(a_float, max_abs_error)`||`argument` is a `float` value close to `a_float` (absolute error <= `max_abs_error`), treating two !NaNs as equal.||
 
 == String Matchers ==
 
