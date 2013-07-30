@@ -1150,7 +1150,8 @@ any positive number, and so on). Also, containers used in tests often
 have a small number of elements, and having to define the expected
 container out-of-line is a bit of a hassle.
 
-You can use the `ElementsAre()` matcher in such cases:
+You can use the `ElementsAre()` or `UnorderedElementsAre()` matcher in
+such cases:
 
 {{{
 using ::testing::_;
@@ -1167,9 +1168,27 @@ using ::testing::Gt;
 The above matcher says that the container must have 4 elements, which
 must be 1, greater than 0, anything, and 5 respectively.
 
-`ElementsAre()` is overloaded to take 0 to 10 arguments. If more are
-needed, you can place them in a C-style array and use
-`ElementsAreArray()` instead:
+If you instead write:
+
+{{{
+using ::testing::_;
+using ::testing::Gt;
+using ::testing::UnorderedElementsAre;
+...
+
+  MOCK_METHOD1(Foo, void(const vector<int>& numbers));
+...
+
+  EXPECT_CALL(mock, Foo(UnorderedElementsAre(1, Gt(0), _, 5)));
+}}}
+
+It means that the container must have 4 elements, which under some
+permutation must be 1, greater than 0, anything, and 5 respectively.
+
+`ElementsAre()` and `UnorderedElementsAre()` are overloaded to take 0
+to 10 arguments. If more are needed, you can place them in a C-style
+array and use `ElementsAreArray()` or `UnorderedElementsAreArray()`
+instead:
 
 {{{
 using ::testing::ElementsAreArray;
