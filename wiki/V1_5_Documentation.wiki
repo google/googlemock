@@ -1,5 +1,4 @@
 #summary Documentation on Google Mock version 1.5.0
-#labels Featured
 
 This page lists all documentation wiki pages for Google Mock *version 1.5.0* -- *if you use a different version of Google Mock, please read the documentation for that specific version instead.*
 
