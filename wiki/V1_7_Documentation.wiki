@@ -1,4 +1,4 @@
-#summary Documentation on Google Mock (the SVN trunk version)
+#summary Documentation on Google Mock version 1.7
 #labels Featured
 
 This page lists all documentation wiki pages for Google Mock *(the SVN trunk version)*
