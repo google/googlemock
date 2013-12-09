@@ -1257,6 +1257,8 @@ Keep in mind that one doesn't have to verify more than one property in one test.
 
 So use `ON_CALL` by default, and only use `EXPECT_CALL` when you actually intend to verify that the call is made. For example, you may have a bunch of `ON_CALL`s in your test fixture to set the common mock behavior shared by all tests in the same group, and write (scarcely) different `EXPECT_CALL`s in different `TEST_F`s to verify different aspects of the code's behavior. Compared with the style where each `TEST` has many `EXPECT_CALL`s, this leads to tests that are more resilient to implementational changes (and thus less likely to require maintenance) and makes the intent of the tests more obvious (so they are easier to maintain when you do need to maintain them).
 
+If you are bothered by the "Uninteresting mock function call" message printed when a mock method without an `EXPECT_CALL` is called, you may use a `NiceMock` instead to suppress all such messages for the mock object, or suppress the message for specific methods by adding `EXPECT_CALL(...).Times(AnyNumber())`. DO NOT suppress it by blindly adding an `EXPECT_CALL(...)`, or you'll have a test that's a pain to maintain.
+
 ==  Ignoring Uninteresting Calls ==
 
 If you are not interested in how a mock method is called, just don't
