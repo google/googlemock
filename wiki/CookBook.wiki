@@ -841,7 +841,7 @@ says that the first argument of `InRange()` must not be 0, and must be
 less than the second argument.
 
 The expression inside `With()` must be a matcher of type
-`Matcher<tr1::tuple<A1, ..., An> >`, where `A1`, ..., `An` are the
+`Matcher< ::testing::tuple<A1, ..., An> >`, where `A1`, ..., `An` are the
 types of the function arguments.
 
 You can also write `AllArgs(m)` instead of `m` inside `.With()`. The
@@ -870,8 +870,7 @@ the complete list.
 
 Note that if you want to pass the arguments to a predicate of your own
 (e.g. `.With(Args<0, 1>(Truly(&MyPredicate)))`), that predicate MUST be
-written to take a `tr1::tuple` as its argument; Google Mock will pass the `n`
-selected arguments as _one_ single tuple to the predicate.
+written to take a `::testing::tuple` as its argument; Google Mock will pass the `n` selected arguments as _one_ single tuple to the predicate.
 
 ==  Using Matchers as Predicates ==
 
@@ -3112,7 +3111,7 @@ we have:
 || `arg1` || the value of `ptr` ||
 || `arg1_type` || the type `int*` ||
 || `args` || the tuple `(flag, ptr)` ||
-|| `args_type` || the type `std::tr1::tuple<bool, int*>` ||
+|| `args_type` || the type `::testing::tuple<bool, int*>` ||
 || `return_type` || the type `int` ||
 || `function_type` || the type `int(bool, int*)` ||
 
@@ -3222,7 +3221,7 @@ ACTION_TEMPLATE(DuplicateArg,
                 // Note the comma between int and k:
                 HAS_2_TEMPLATE_PARAMS(int, k, typename, T),
                 AND_1_VALUE_PARAMS(output)) {
-  *output = T(std::tr1::get<k>(args));
+  *output = T(::testing::get<k>(args));
 }
 }}}
 
@@ -3303,7 +3302,7 @@ template <typename F>class ActionInterface {
   // F, and ArgumentTuple is the tuple of arguments of F.
   //
   // For example, if F is int(bool, const string&), then Result would
-  // be int, and ArgumentTuple would be tr1::tuple<bool, const string&>.
+  // be int, and ArgumentTuple would be ::testing::tuple<bool, const string&>.
   virtual Result Perform(const ArgumentTuple& args) = 0;
 };
 
@@ -3316,8 +3315,8 @@ typedef int IncrementMethod(int*);
 
 class IncrementArgumentAction : public ActionInterface<IncrementMethod> {
  public:
-  virtual int Perform(const tr1::tuple<int*>& args) {
-    int* p = tr1::get<0>(args);  // Grabs the first argument.
+  virtual int Perform(const ::testing::tuple<int*>& args) {
+    int* p = ::testing::get<0>(args);  // Grabs the first argument.
     return *p++;
   }
 };
@@ -3364,8 +3363,8 @@ class ReturnSecondArgumentAction {
  public:
   template <typename Result, typename ArgumentTuple>
   Result Perform(const ArgumentTuple& args) const {
-    // To get the i-th (0-based) argument, use tr1::get<i>(args).
-    return tr1::get<1>(args);
+    // To get the i-th (0-based) argument, use ::testing::get<i>(args).
+    return ::testing::get<1>(args);
   }
 };
 }}}
