@@ -111,9 +111,14 @@ To customize the default action for functions with return type `T` globally:
 {{{
 using ::testing::DefaultValue;
 
-DefaultValue<T>::Set(value);  // Sets the default value to be returned.
+// Sets the default value to be returned. T must be CopyConstructible.
+DefaultValue<T>::Set(value);
+// Sets a factory. Will be invoked on demand. T must be MoveConstructible.
+//   T MakeT();
+DefaultValue<T>::SetFactory(&MakeT);
 // ... use the mocks ...
-DefaultValue<T>::Clear();     // Resets the default value.
+// Resets the default value.
+DefaultValue<T>::Clear();
 }}}
 
 To customize the default action for a particular method, use `ON_CALL()`:
