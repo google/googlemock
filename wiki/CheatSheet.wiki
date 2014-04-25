@@ -278,6 +278,7 @@ EXPECT_THAT(actual_foos, Pointwise(FooEq(), expected_foos));
 == Pointer Matchers ==
 
 ||`Pointee(m)`||`argument` (either a smart pointer or a raw pointer) points to a value that matches matcher `m`.||
+||`WhenDynamicCastTo<T>(m)`|| when `argument` is passed through `dynamic_cast<T>()`, it matches matcher `m`. ||
 
 == Multiargument Matchers ==
 
