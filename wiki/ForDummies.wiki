@@ -277,7 +277,7 @@ The `Times()` clause can be omitted. *If you omit `Times()`, Google Mock will in
 ==  Actions: What Should It Do? ==
 Remember that a mock object doesn't really have a working implementation? We as users have to tell it what to do when a method is invoked. This is easy in Google Mock.
 
-First, if the return type of a mock function is a built-in type or a pointer, the function has a *default action* (a `void` function will just return, a `bool` function will return `false`, and other functions will return 0). If you don't say anything, this behavior will be used.
+First, if the return type of a mock function is a built-in type or a pointer, the function has a *default action* (a `void` function will just return, a `bool` function will return `false`, and other functions will return 0). In addition, in C++ 11 and above, a mock function whose return type is default-constructible (i.e. has a default constructor) has a default action of returning a default-constructed value.  If you don't say anything, this behavior will be used.
 
 Second, if a mock function doesn't have a default action, or the default action doesn't suit you, you can specify the action to be taken each time the expectation matches using a series of `WillOnce()` clauses followed by an optional `WillRepeatedly()`. For example,
 
