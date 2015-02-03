@@ -1695,7 +1695,9 @@ Here `my_mock.GetPrevValue()` will always return the argument of the last `Updat
 ==  Setting the Default Value for a Return Type ==
 
 If a mock method's return type is a built-in C++ type or pointer, by
-default it will return 0 when invoked. You only need to specify an
+default it will return 0 when invoked. Also, in C++ 11 and above, a mock
+method whose return type has a default constructor will return a default-constructed
+value by default.  You only need to specify an
 action if this default value doesn't work for you.
 
 Sometimes, you may want to change this default value, or you may want
