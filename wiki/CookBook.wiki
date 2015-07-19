@@ -1298,6 +1298,54 @@ using ::testing::Gt;
 A call to `foo.Bar()` that doesn't match any of the `EXPECT_CALL()`
 statements will be an error.
 
+== Understanding Uninteresting vs Unexpected Calls ==
+
+_Uninteresting_ calls and _unexpected_ calls are different concepts in Google Mock. _Very_ different.
+
+A call `x.Y(...)` is *uninteresting* if there's _not even a single_ `EXPECT_CALL(x, Y(...))` set. In other words, the test isn't interested in the `x.Y()` method at all, as evident in that the test doesn't care to say anything about it.
+
+A call `x.Y(...)` is *unexpected* if there are some `EXPECT_CALL(x, Y(...))s` set, but none of them matches the call. Put another way, the test is interested in the `x.Y()` method (therefore it _explicitly_ sets some `EXPECT_CALL` to verify how it's called); however, the verification fails as the test doesn't expect this particular call to happen.
+
+*An unexpected call is always an error,* as the code under test doesn't behave the way the test expects it to behave.
+
+*By default, an uninteresting call is not an error,* as it violates no constraint specified by the test. (Google Mock's philosophy is that saying nothing means there is no constraint.) However, it leads to a warning, as it _might_ indicate a problem (e.g. the test author might have forgotten to specify a constraint).
+
+In Google Mock, `NiceMock` and `StrictMock` can be used to make a mock class "nice" or "strict". How does this affect uninteresting calls and unexpected calls?
+
+A *nice mock* suppresses uninteresting call warnings. It is less chatty than the default mock, but otherwise is the same. If a test fails with a default mock, it will also fail using a nice mock instead. And vice versa. Don't expect making a mock nice to change the test's result.
+
+A *strict mock* turns uninteresting call warnings into errors. So making a mock strict may change the test's result.
+
+Let's look at an example:
+
+{{{
+TEST(...) {
+  NiceMock<MockDomainRegistry> mock_registry;
+  EXPECT_CALL(mock_registry, GetDomainOwner("google.com"))
+          .WillRepeatedly(Return("Larry Page"));
+
+  // Use mock_registry in code under test.
+  ... &mock_registry ...
+}
+}}}
+
+The sole `EXPECT_CALL` here says that all calls to `GetDomainOwner()` must have `"google.com"` as the argument. If `GetDomainOwner("yahoo.com")` is called, it will be an unexpected call, and thus an error. Having a nice mock doesn't change the severity of an unexpected call.
+
+So how do we tell Google Mock that `GetDomainOwner()` can be called with some other arguments as well? The standard technique is to add a "catch all" `EXPECT_CALL`:
+
+{{{
+  EXPECT_CALL(mock_registry, GetDomainOwner(_))
+        .Times(AnyNumber());  // catches all other calls to this method.
+  EXPECT_CALL(mock_registry, GetDomainOwner("google.com"))
+        .WillRepeatedly(Return("Larry Page"));
+}}}
+
+Remember that `_` is the wildcard matcher that matches anything. With this, if `GetDomainOwner("google.com")` is called, it will do what the second `EXPECT_CALL` says; if it is called with a different argument, it will do what the first `EXPECT_CALL` says.
+
+Note that the order of the two `EXPECT_CALLs` is important, as a newer `EXPECT_CALL` takes precedence over an older one.
+
+For more on uninteresting calls, nice mocks, and strict mocks, read [https://code.google.com/p/googlemock/w/edit/CookBook#NiceStrictNaggy "The Nice, the Strict, and the Naggy"].
+
 ==  Expecting Ordered Calls ==
 
 Although an `EXPECT_CALL()` statement defined earlier takes precedence
@@ -2620,7 +2668,7 @@ Remember the steps for using a mock:
   # Destroy the mock yourself, or let the code under test destroy it. The destructor will automatically verify it. 
 
 If you follow the following simple rules, your mocks and threads can
-live happily togeter:
+live happily together:
  
   * Execute your _test code_ (as opposed to the code being tested) in _one_ thread. This makes your test easy to follow. 
   * Obviously, you can do step #1 without locking. 
