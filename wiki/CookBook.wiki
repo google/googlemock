@@ -1344,7 +1344,7 @@ Remember that `_` is the wildcard matcher that matches anything. With this, if `
 
 Note that the order of the two `EXPECT_CALLs` is important, as a newer `EXPECT_CALL` takes precedence over an older one.
 
-For more on uninteresting calls, nice mocks, and strict mocks, read [https://code.google.com/p/googlemock/w/edit/CookBook#NiceStrictNaggy "The Nice, the Strict, and the Naggy"].
+For more on uninteresting calls, nice mocks, and strict mocks, read [https://code.google.com/p/googlemock/w/edit/CookBook#The_Nice,_the_Strict,_and_the_Naggy "The Nice, the Strict, and the Naggy"].
 
 ==  Expecting Ordered Calls ==
 
