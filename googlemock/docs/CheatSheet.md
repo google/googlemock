@@ -385,7 +385,7 @@ You can make a matcher from one or more other matchers:
 
 |`Invoke(f)`|Invoke `f` with the arguments passed to the mock function, where `f` can be a global/static function or a functor.|
 |:----------|:-----------------------------------------------------------------------------------------------------------------|
-|`Invoke(object_pointer, &class::method)`|Invoke the {method on the object with the arguments passed to the mock function.                                  |
+|`Invoke(object_pointer, &class::method)`|Invoke the method on the object with the arguments passed to the mock function.                                  |
 |`InvokeWithoutArgs(f)`|Invoke `f`, which can be a global/static function or a functor. `f` must take no arguments.                       |
 |`InvokeWithoutArgs(object_pointer, &class::method)`|Invoke the method on the object, which takes no arguments.                                                        |
 |`InvokeArgument<N>(arg1, arg2, ..., argk)`|Invoke the mock function's `N`-th (0-based) argument, which must be a function or a functor, with the `k` arguments.|
