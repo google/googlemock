@@ -52,7 +52,7 @@ AS_IF([test "x$with_pthreads" != "xno"],
                [AC_MSG_FAILURE(
                  [--with-pthreads was specified, but unable to be used])])])
        have_pthreads="$acx_pthread_ok"])
-AM_CONDITIONAL([HAVE_PTHREADS],[test "x$have_pthreads" == "xyes"])
+AM_CONDITIONAL([HAVE_PTHREADS],[test "x$have_pthreads" = "xyes"])
 AC_SUBST(PTHREAD_CFLAGS)
 AC_SUBST(PTHREAD_LIBS)
 
@@ -76,7 +76,7 @@ AC_ARG_ENABLE([external-gtest],
                               installed or user provided gtest. Any option to
                               '--with-gtest' is ignored. (Default is enabled.)])
               ], [], [enable_external_gtest=yes])
-AS_IF([test "x$with_gtest" == "xno"],
+AS_IF([test "x$with_gtest" = "xno"],
       [AC_MSG_ERROR([dnl
 Support for GoogleTest was explicitly disabled. Currently GoogleMock has a hard
 dependency upon GoogleTest to build, please provide a version, or allow
