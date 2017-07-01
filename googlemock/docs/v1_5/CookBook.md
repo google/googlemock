@@ -1032,8 +1032,9 @@ a value that satisfies matcher `m`.
 
 For example:
 
-| `Field(&Foo::number, Ge(3))` | Matches `x` where `x.number >= 3`. |
+| Expression                   | Description                        |
 |:-----------------------------|:-----------------------------------|
+| `Field(&Foo::number, Ge(3))` | Matches `x` where `x.number >= 3`. |
 | `Property(&Foo::name, StartsWith("John "))` | Matches `x` where `x.name()` starts with `"John "`. |
 
 Note that in `Property(&Foo::baz, ...)`, method `baz()` must take no
