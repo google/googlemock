@@ -1,7 +1,7 @@
 
 
 You can find recipes for using Google Mock here. If you haven't yet,
-please read the [ForDummies](V1_6_ForDummies.md) document first to make sure you understand
+please read the [ForDummies](ForDummies.md) document first to make sure you understand
 the basics.
 
 **Note:** Google Mock lives in the `testing` name space. For
